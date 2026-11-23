@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>龙吟写作 · 同类产品调研与竞品分析报告</title>
+  <style>
+    :root {
+      --bg: #f4f5f1;
+      --paper: #ffffff;
+      --text: #222821;
+      --secondary: #626b61;
+      --tertiary: #8a9288;
+      --line: #dfe3db;
+      --line-strong: #c9cfc5;
+      --accent: #386150;
+      --accent-soft: #e8efe9;
+      --warm: #f2ede4;
+      --warm-text: #765b39;
+      --danger-soft: #f5e9e7;
+      --danger: #8f4e45;
+      --max: 1120px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: "Segoe UI", "Microsoft YaHei", sans-serif; font-size: 14px; line-height: 1.8; }
+    a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    a:hover { color: #244235; }
+    .hero { padding: 66px 28px 46px; background: var(--paper); border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; }
+    .kicker { color: var(--accent); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; }
+    h1 { max-width: 800px; margin: 12px 0 14px; font-size: 38px; line-height: 1.25; letter-spacing: -.5px; }
+    .subtitle { max-width: 780px; margin: 0; color: var(--secondary); font-size: 15px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 26px; color: var(--tertiary); font-size: 11px; }
+    .layout { max-width: var(--max); margin: 0 auto; padding: 34px 28px 70px; }
+    .toc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; overflow: hidden; margin-bottom: 38px; border: 1px solid var(--line); border-radius: 8px; background: var(--line); }
+    .toc a { padding: 12px 14px; background: var(--paper); color: var(--secondary); font-size: 12px; text-decoration: none; }
+    .toc a:hover { background: var(--accent-soft); color: var(--accent); }
+    section { margin-bottom: 45px; }
+    h2 { margin: 0 0 18px; font-size: 24px; line-height: 1.35; }
+    h3 { margin: 28px 0 10px; font-size: 17px; }
+    h4 { margin: 20px 0 7px; font-size: 14px; }
+    p { margin: 0 0 13px; }
+    ul, ol { margin: 8px 0 16px; padding-left: 23px; }
+    li { margin: 4px 0; }
+    strong { font-weight: 650; }
+    .lead { max-width: 850px; color: var(--secondary); font-size: 15px; }
+    .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 22px 0 4px; }
+    .summary-item { padding: 17px 18px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+    .summary-item b { display: block; margin-bottom: 5px; color: var(--accent); font-size: 13px; }
+    .summary-item p { margin: 0; color: var(--secondary); font-size: 12px; line-height: 1.75; }
+    .callout { margin: 22px 0; padding: 16px 19px; border-left: 3px solid var(--accent); background: var(--accent-soft); }
+    .callout.warning { border-left-color: var(--warm-text); background: var(--warm); }
+    .callout.risk { border-left-color: var(--danger); background: var(--danger-soft); }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout-label { display: block; margin-bottom: 4px; color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: .8px; }
+    .warning .callout-label { color: var(--warm-text); }
+    .risk .callout-label { color: var(--danger); }
+    .table-wrap { overflow-x: auto; margin: 17px 0 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.65; }
+    th { padding: 11px 12px; border-bottom: 1px solid var(--line-strong); background: #f8f9f6; color: var(--secondary); font-size: 10px; font-weight: 650; text-align: left; white-space: nowrap; }
+    td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:last-child td { border-bottom: 0; }
+    td:first-child { color: var(--text); font-weight: 600; }
+    .note { margin-top: 7px; color: var(--tertiary); font-size: 10px; }
+    .tag { display: inline-block; margin: 0 3px 4px 0; padding: 2px 6px; border: 1px solid var(--line-strong); border-radius: 3px; color: var(--secondary); background: #f8f9f6; font-size: 10px; white-space: nowrap; }
+    .tag.good { border-color: #c7d7cc; color: var(--accent); background: var(--accent-soft); }
+    .tag.warn { border-color: #ddcfb9; color: var(--warm-text); background: var(--warm); }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
+    .card { padding: 17px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+    .card h3 { margin: 0 0 7px; font-size: 14px; }
+    .card p { margin: 0; color: var(--secondary); font-size: 12px; }
+    .matrix { font-size: 11px; }
+    .matrix td, .matrix th { padding: 9px 9px; }
+    .matrix .target td { background: #edf3ef; font-weight: 600; }
+    .yes { color: var(--accent); font-weight: 650; }
+    .partial { color: var(--warm-text); }
+    .none { color: var(--tertiary); }
+    .priority { border-top: 1px solid var(--line); }
+    .priority-row { display: grid; grid-template-columns: 64px minmax(130px, .7fr) 1.6fr; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+    .priority-code { color: var(--accent); font-family: Consolas, monospace; font-size: 12px; font-weight: 700; }
+    .priority-title { font-weight: 650; }
+    .priority-desc { color: var(--secondary); font-size: 12px; }
+    .source-list { columns: 2; column-gap: 38px; padding-left: 21px; font-size: 11px; line-height: 1.65; }
+    .source-list li { break-inside: avoid; margin-bottom: 8px; color: var(--secondary); }
+    .source-list a { word-break: break-all; }
+    footer { padding: 24px 28px 50px; border-top: 1px solid var(--line); color: var(--tertiary); font-size: 10px; text-align: center; }
+    @media (max-width: 850px) {
+      h1 { font-size: 30px; }
+      .toc { grid-template-columns: repeat(2, 1fr); }
+      .summary, .cards { grid-template-columns: 1fr; }
+      .source-list { columns: 1; }
+      .priority-row { grid-template-columns: 50px 1fr; }
+      .priority-desc { grid-column: 2; }
+    }
+    @media print {
+      body { background: #fff; font-size: 11pt; }
+      .hero { padding-top: 28px; }
+      .toc { display: none; }
+      section { break-inside: avoid-page; }
+      .table-wrap { overflow: visible; }
+      a { color: inherit; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="kicker">PRODUCT RESEARCH · 2026-10-30</div>
+      <h1>龙吟写作：同类产品调研与竞品分析报告</h1>
+      <p class="subtitle">从 GitHub 开源项目和成熟商业产品出发，判断“账户隔离、自有服务器、结构化世界设定与长篇正文写作一体化”是否成立，以及产品下一步应当强化什么。</p>
+      <div class="meta"><span>调研对象：写作平台、世界构建工具、大纲与人物关系工具</span><span>样本截点：2026-10-30</span><span>资料范围：GitHub 公共仓库与产品官方页面</span></div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <nav class="toc" aria-label="报告目录">
+      <a href="#summary">01 结论摘要</a>
+      <a href="#method">02 调研方法</a>
+      <a href="#github">03 GitHub 开源格局</a>
+      <a href="#commercial">04 商业产品格局</a>
+      <a href="#matrix">05 能力矩阵</a>
+      <a href="#analysis">06 分模块判断</a>
+      <a href="#position">07 龙吟的机会</a>
+      <a href="#risks">08 风险与取舍</a>
+      <a href="#priority">09 落地优先级</a>
+      <a href="#validation">10 验证清单</a>
+      <a href="#sources">11 资料来源</a>
+      <a href="#limits">12 调研限制</a>
+    </nav>
+
+    <section id="summary">
+      <h2>01 结论摘要</h2>
+      <p class="lead">这个市场并不缺功能。真正的空位不是“再做一个人物关系图”或“再做一个地图”，而是让这些资料围绕一部长篇小说持续联动，并让作者掌握账户和数据所在的服务器。</p>
+      <div class="summary">
+        <div class="summary-item"><b>功能层面没有单点空白</b><p>大纲、素材、地图、人物关系、物品设定和正文编辑，在商业产品或多款开源项目中都能找到成熟实现。</p></div>
+        <div class="summary-item"><b>一体化仍集中在商业产品</b><p>Campfire、World Anvil、Novelcrafter 等已覆盖多个模块，但数据依赖厂商云端账户；开源产品通常只强于其中一两项。</p></div>
+        <div class="summary-item"><b>自托管不是空白，但很早期</b><p>本轮样本中出现 novel-it、novel-app、Odysseum 等自有服务器项目，成熟度普遍低；账户隔离与结构化写作结合者更少。</p></div>
+        <div class="summary-item"><b>龙吟的胜负手是数据关系</b><p>“共享原件＋作品扩展＋人物对绑定关系＋剧情阶段”比模块数量更有辨识度；编辑器速度与可迁移性决定作者愿不愿意长期使用。</p></div>
+      </div>
+      <div class="callout">
+        <span class="callout-label">核心判断</span>
+        <p><strong>龙吟不应定位成“功能更多的写作软件”，而应定位成“作者自己掌控的结构化长篇创作工作台”。</strong>对外需要讲的不是六个模块，而是一句话：人物、地点、武器、素材和正文始终互相对应，账户与数据运行在自己的服务器上。</p>
+      </div>
+    </section>
+
+    <section id="method">
+      <h2>02 调研方法与范围</h2>
+      <p>本次调研采用两类样本：一是通过 GitHub 公共 API 检索的写作、世界观构建、自托管写作项目；二是成熟商业产品的公开功能页。产品功能判断以 README 或官方页面明确描述为准，不根据截图猜测未写明的内部数据模型。</p>
+      <div class="cards">
+        <div class="card"><h3>GitHub 检索</h3><p>围绕 novel writing、worldbuilding、story bible、character relationship、self-hosted writing、writing-app 等关键词检索，并逐项核对仓库元数据、许可证和 README。</p></div>
+        <div class="card"><h3>商业产品核对</h3><p>覆盖 Campfire、World Anvil、Novelcrafter、Plottr、Scrivener、bibisco，重点看模块边界、账户方式、数据存储和跨书共享。</p></div>
+        <div class="card"><h3>对照基线</h3><p>以当前龙吟需求为固定基线：必须登录、账户数据保存在本地服务器、支持外网访问，六类创作数据和正文围绕作品组织。</p></div>
+      </div>
+      <div class="callout warning">
+        <span class="callout-label">口径说明</span>
+        <p>GitHub star 是关注度指标，不是产品质量、维护质量或商业可行性的证明。表中的活跃时间与 star 均为 2026-10-30 查询结果，后续会变化。</p>
+      </div>
+    </section>
+
+    <section id="github">
+      <h2>03 GitHub 开源格局</h2>
+      <h3>3.1 代表项目横向对比</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>代表项目</th><th>形态与许可证</th><th>GitHub 数据</th><th>已确认的核心能力</th><th>相对龙吟的主要缺口</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://github.com/saga-soft/novelWriter">novelWriter</a></td><td>桌面 · GPL-3.0</td><td>3,205 star / 2026-10 活跃</td><td>纯文本小说编辑；人类可读文件；注释、梗概和交叉引用元数据；按章节组织。</td><td>没有地图、人物关系图、账户与自有服务器模型。</td></tr>
+            <tr><td><a href="https://github.com/olivierkes/manuskript">Manuskript</a></td><td>桌面 · GPL-3.0</td><td>2,470 star / 2026-09 活跃</td><td>从故事前提、人物、世界到故事线；大纲与专注写作；HTML、ePub、DocX 导出。</td><td>没有关系图谱、地图和跨作品共享设定。</td></tr>
+            <tr><td><a href="https://github.com/EthanYoQ/AI-Novel-Writer">Pagekin / AI-Novel-Writer</a></td><td>桌面 · GPL-3.0</td><td>1,996 star / 2026-10 活跃</td><td>设定、蓝图、正文和审稿；本地数据；通过用户自配模型进行 AI 生成。</td><td>AI 是产品主轴；没有账户服务器与多模块联动的明确设计。</td></tr>
+            <tr><td><a href="https://github.com/andreafeccomandi/bibisco">bibisco</a></td><td>桌面 · GPL-3.0</td><td>772 star / 2024 后基本停更</td><td>章节与场景、人物、时间线、地点和物品；小说分析；PDF、DocX、TXT 导出；官方提供付费同步服务。</td><td>开源版本活跃度低；跨作品共享和关系图不突出。</td></tr>
+            <tr><td><a href="https://github.com/xiaoshengxianjun/51mazi">51mazi</a></td><td>Electron 桌面 · MIT</td><td>487 star / 2026-09 更新</td><td>小说地图设计、人物关系图、人物档案、时间线、TipTap 正文编辑和本地存储。</td><td>没有账户、外网访问和共享设定库；AI 与下载功能混在产品中。</td></tr>
+            <tr><td><a href="https://github.com/uu201/character-arc">CharacterArc</a></td><td>桌面 · MIT</td><td>593 star / 2026-10 活跃</td><td>项目设定、角色关系、剧情大纲、章节写作；SQLite 本地存储；多模型 AI 协作。</td><td>本地单用户；AI 工作流占主导；地图与共享库未见明确能力。</td></tr>
+            <tr><td><a href="https://github.com/TaylliSun/worldcraft-codex">Worldcraft Codex</a></td><td>本地桌面 · 未见明确许可证</td><td>104 star / 2026-10 更新</td><td>Wiki、小说、无限地图画布、人物关系图、时间线和 AI 辅助；数据留在本机。</td><td>无账户与云/服务器同步；项目规模小，许可证状态不清晰。</td></tr>
+            <tr><td><a href="https://github.com/smith-and-web/kindling">Kindling</a></td><td>桌面 · MIT</td><td>76 star / 2026-10 活跃</td><td>大纲节拍、人物/地点引用、正文编辑；本地 SQLite；可导入 Scrivener、Plottr、yWriter、Obsidian Longform。</td><td>没有地图、关系图谱、共享库和多用户服务器。</td></tr>
+            <tr><td><a href="https://github.com/david-hollingworth/novel-it">novel-it</a></td><td>自托管 Web · AGPL-3.0</td><td>1 star / 2026-08 更新</td><td>每个用户只能看到自己的小说；SQLite/PostgreSQL；人物与地点数据库；可通过反向代理访问。</td><td>极早期；无地图、关系图、共享设定库和成熟编辑体验。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">说明：star 和更新时间来自 GitHub API 快照。bibisco 的官方功能页持续更新，但开源仓库自 2024 年 9 月后未再推送。</p>
+
+      <h3>3.2 GitHub 上的三个明显信号</h3>
+      <h4>传统写作软件的竞争点是大纲、编辑与文件可读性</h4>
+      <p>novelWriter 和 Manuskript 都选择本地文件与纯文本或结构化文本，核心竞争力是可持续写作和可导出，而不是社交或协作。novelWriter 以“人类可读的文本文件”为存储原则，说明目标用户高度重视数据掌控与长期可迁移性。</p>
+
+      <h4>较新的开源项目普遍转向 AI，而不是补全世界观模块</h4>
+      <p>本轮以 novel-writing 为 topic 的高星项目中，头部大量是 AI 写作技能、Agent 流程或整本生成工具，例如 oh-story-claudecode、chinese-novelist-skill、OpenFic。它们增长快，但解决的是“生成内容”，不是“持续维护作者自己的设定与正文关系”。龙吟若跟着堆 AI，会进入一个供给拥挤且快速变化的战场。</p>
+
+      <h4>“自托管”已有探索者，但没有成熟的一体化产品</h4>
+      <p>novel-it 已实现多用户隔离、SQLite/PostgreSQL 和反向代理访问；novel-app 采用 Python 后端、网页前端和本地数据目录；Odysseum 则探索自托管 Markdown 与插件。结论是：<strong>技术上并不独特，产品完整度才是机会</strong>。这些项目 star 很低，不代表需求不存在，说明还没有产品把部署、账户、写作和世界设定同时做好。</p>
+
+      <h3>3.3 一个值得警惕的概念验证</h3>
+      <p><a href="https://github.com/gavin-wolfe/wolfden">Wolfden</a> 用 Markdown＋Git 管理 Author → Universe → Series → Book 层级，并用 book/chapter 标记事实生效范围，形成“故事内视角下的 canon”。它和龙吟的“共享原件＋作品扩展＋剧情阶段”方向高度接近，但 Wolfden 仍是早期 CLI 思路、没有成熟 UI。这个样本说明我们的数据思路有合理性，但也说明仅凭数据模型无法建立产品壁垒。</p>
+    </section>
+
+    <section id="commercial">
+      <h2>04 商业产品格局</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>产品</th><th>核心定位</th><th>与龙吟重叠的能力</th><th>数据与账户</th><th>龙吟可借与需避开的地方</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://campfirewriting.com/write">Campfire Writing</a></td><td>模块化小说创作与世界构建</td><td>人物、关系流程与家谱、地图上传/图层/钉点、时间线、故事弧、世界观条目、正文模块。</td><td>商业订阅，云端账户；未确认本地可读数据。</td><td>最接近“全模块写作平台”的标杆；应避开大而全的信息负担，做更适合中文长篇的默认工作流。</td></tr>
+            <tr><td><a href="https://www.worldanvil.com/worldbuilding-software">World Anvil</a></td><td>世界观百科与 RPG 世界管理</td><td>百科条目、互动地图、时间线、家谱、外交关系网、世界构建工具。</td><td>云端账户与订阅。</td><td>证明互链设定和地图有价值；其 RPG 取向比小说写作更重，龙吟应收敛到作者视角。</td></tr>
+            <tr><td><a href="https://www.novelcrafter.com/features">Novelcrafter</a></td><td>Codex＋长篇小说编辑器＋AI</td><td>Codex 自定义分类与元数据、Relations 关系、系列内共享、章节场景、富文本和专注模式。</td><td>云端账户；Codex 支持系列级共享。</td><td>“跨书共享设定”已被市场验证；龙吟应把共享与作品内覆盖做得更清楚，而非只做一个大设定库。</td></tr>
+            <tr><td><a href="https://plottr.com/features/">Plottr</a></td><td>视觉大纲与系列圣经</td><td>拖拽时间线、书籍与系列规划、人物与地点资料、系列圣经、导出。</td><td>桌面/网页，官方提供云同步与备份。</td><td>大纲必须能跨书、跨时间线查看；单一章节表单不足以竞争。</td></tr>
+            <tr><td><a href="https://www.literatureandlatte.com/scrivener/overview">Scrivener</a></td><td>专业长篇写作与稿件编译</td><td>Binder 结构、Corkboard、Scrivenings、快照、研究资料、Compile 导出。</td><td>本地项目文件；通过 Dropbox 等同步。</td><td>正文工程的完成度和稳定性是底线；关系图不能替代好用的编辑器。</td></tr>
+            <tr><td><a href="https://obsidian.md/">Obsidian＋Longform</a></td><td>本地 Markdown 知识库与插件化写作</td><td>双向链接、关系图、Canvas、Longform 大纲与稿件编译、插件生态。</td><td>本地 Markdown；同步为附加服务。</td><td>灵活但依赖用户自己搭结构；龙吟要把“作者需要的关系和字段”变成默认能力，而不是交给插件。</td></tr>
+            <tr><td><a href="https://bibisco.com/writer-software-bibisco-features/">bibisco</a></td><td>人物驱动的小说写作软件</td><td>章节场景、人物、地点、物品、时间线、叙事分析。</td><td>桌面本地；官方另售跨设备同步。</td><td>人物深度与时间线值得参考；“物品/地点”通常作为通用条目，不适合只做独立武器系统。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">
+        <span class="callout-label">商业产品给出的答案</span>
+        <p>“全模块＋账户云端”已被验证有付费市场；“本地文件＋自由插件”也已被验证有忠实用户。尚未被充分解决的是两者之间：<strong>像本地产品一样掌握数据，又像商业 SaaS 一样随时登录使用，并提供一体化的长篇小说工作流。</strong></p>
+      </div>
+    </section>
+
+    <section id="matrix">
+      <h2>05 核心能力矩阵</h2>
+      <p>下表只比较与龙吟直接相关的七类能力。“有”表示官方页面或 README 明确支持；“部分”表示需要通用条目、插件或间接实现；“未见”表示本轮资料中没有明确说明。</p>
+      <div class="table-wrap">
+        <table class="matrix">
+          <thead><tr><th>产品 / 方案</th><th>故事大纲</th><th>素材与设定库</th><th>地图</th><th>人物关系</th><th>物品/武器模板</th><th>正文工程</th><th>跨作品共享</th><th>账户与数据归属</th></tr></thead>
+          <tbody>
+            <tr><td>Campfire</td><td class="yes">有</td><td class="yes">有</td><td class="yes">有</td><td class="yes">有</td><td class="partial">通用模块</td><td class="yes">有</td><td class="none">未明确</td><td class="partial">云账户</td></tr>
+            <tr><td>World Anvil</td><td class="partial">部分</td><td class="yes">有</td><td class="yes">有</td><td class="yes">有</td><td class="partial">百科条目</td><td class="partial">有写作工具</td><td class="partial">世界级</td><td class="partial">云账户</td></tr>
+            <tr><td>Novelcrafter</td><td class="yes">有</td><td class="yes">有</td><td class="none">未突出</td><td class="yes">有</td><td class="partial">Codex 自定义</td><td class="yes">有</td><td class="yes">系列共享</td><td class="partial">云账户</td></tr>
+            <tr><td>Plottr</td><td class="yes">有</td><td class="yes">系列圣经</td><td class="none">未见</td><td class="partial">人物条目</td><td class="partial">自定义属性</td><td class="none">导出到写作工具</td><td class="yes">系列级</td><td class="partial">云同步账户</td></tr>
+            <tr><td>Scrivener</td><td class="yes">有</td><td class="yes">研究资料</td><td class="none">未见</td><td class="none">未见</td><td class="none">未见</td><td class="yes">强</td><td class="none">未见</td><td class="yes">本地项目</td></tr>
+            <tr><td>Obsidian＋Longform</td><td class="yes">有</td><td class="yes">有</td><td class="partial">Canvas 非地图</td><td class="partial">通用图谱</td><td class="partial">笔记条目</td><td class="yes">有</td><td class="yes">库内共享</td><td class="yes">本地 Markdown</td></tr>
+            <tr><td>51mazi</td><td class="partial">时间线辅助</td><td class="partial">人物档案</td><td class="yes">地图设计</td><td class="yes">关系图</td><td class="none">未见</td><td class="yes">有</td><td class="none">未见</td><td class="yes">本地单用户</td></tr>
+            <tr><td>novelWriter</td><td class="yes">标签结构</td><td class="partial">笔记与引用</td><td class="none">未见</td><td class="none">未见</td><td class="none">未见</td><td class="yes">纯文本</td><td class="none">未见</td><td class="yes">本地文件</td></tr>
+            <tr><td>Manuskript</td><td class="yes">有</td><td class="yes">世界与人物</td><td class="none">未见</td><td class="partial">人物档案</td><td class="none">未见</td><td class="yes">有</td><td class="none">未见</td><td class="yes">本地项目</td></tr>
+            <tr><td>novel-it</td><td class="yes">有</td><td class="partial">人物地点库</td><td class="none">未见</td><td class="none">未见</td><td class="none">未见</td><td class="yes">有</td><td class="none">未见</td><td class="yes">自托管多用户隔离</td></tr>
+            <tr class="target"><td>龙吟目标</td><td>总纲/分卷/章节</td><td>共享库＋作品扩展</td><td>底图/图层/地点</td><td>关系对＋阶段</td><td>物品模板含武器</td><td>多标签/快照</td><td>共享原件引用</td><td>账户＋本地服务器＋外网</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">龙吟行是产品目标，不代表已实现程度。</p>
+    </section>
+
+    <section id="analysis">
+      <h2>06 分模块判断</h2>
+
+      <h3>6.1 正文编辑器：效率是入场券，不是差异化</h3>
+      <p>Scrivener 已经用 Binder、Corkboard、Scrivenings 和快照定义了长篇写作工程的基础体验；novelWriter 则证明纯文本和多文件结构可以支撑长期创作。Notepad++ 给龙吟的参考应当是低干扰、多文档、快速查找替换、异常恢复和清晰的本地保存状态，而不是照搬代码编辑器的视觉。</p>
+      <p><strong>判断：</strong>编辑器必须做到“打开快、写得多、找得到、恢复得了”。如果正文体验落后于 Scrivener 或 novelWriter，其他模块再丰富也难以留住作者。</p>
+
+      <h3>6.2 大纲：必须从“章节表单”升级成故事结构</h3>
+      <p>Plottr 以可视化时间线和系列圣经建立优势；Campfire 用时间线、故事弧和多书规划把大纲从单章扩展为整个系列。当前龙吟大纲更接近“卷章树＋单章场景节拍”，适合执行，却缺少整本书的主线、冲突和结局方向。</p>
+      <p><strong>判断：</strong>大纲应采用“故事总纲 → 分卷结构 → 章节卡与场景节拍”三级视图。章节卡继续关联人物、地点和资料，避免大纲与正文成为两套孤立系统。</p>
+
+      <h3>6.3 人物关系：图谱已有强手，龙吟要赢在关系语义</h3>
+      <p>Campfire 的关系模块明确提供关系流程图和家谱；World Anvil 提供家谱与外交关系；Novelcrafter 在 Codex 中提供 Relations。也就是说，画一张人物关系图本身没有竞争壁垒。</p>
+      <p>龙吟已有的“起点人物＋终点人物＋关系类型＋共享/作品归属＋剧情阶段”比普通无向关系图更接近写作需要。它回答的是“在这一卷里，这两个人是什么关系”，而不是“这两个人曾经是什么关系”。</p>
+      <div class="callout warning">
+        <span class="callout-label">产品风险</span>
+        <p>纯图形式关系管理在人物超过 20 个后迅速失控。必须以“当前人物绑定关系列表”为主视图，关系图作为辅助理解，不反过来让用户在一张越来越乱的网里找信息。</p>
+      </div>
+
+      <h3>6.4 素材与设定库：共享是正确的，独立菜单正在重复</h3>
+      <p>Novelcrafter 的 Codex 支持系列级共享，说明跨书设定复用有真实价值；Plottr 的系列圣经也支持集中维护人物和地点；Scrivener 的研究资料和 Obsidian 的双链则证明作者会把大量素材与稿件放在同一工作区。</p>
+      <p>但当前龙吟同时存在“设定库”“素材库”“人物关系”“武器设定”四个入口，单部作品内会形成明显重复。共享原件应当属于账户层，作品页面只展示“被本作品引用后的状态和扩展”。</p>
+      <p><strong>判断：</strong>把设定库移到账户级共享库；人物、地点、物品、素材页面通过“引用共享设定”进入。作品内不再单独放一个泛化设定库入口。</p>
+
+      <h3>6.5 地图：先别做地图绘制器</h3>
+      <p>Campfire 的地图能力是上传地图、创建图层、在地图上钉选元素；World Anvil 和 LegendKeeper 也是“地图＋钉点＋关联条目”的逻辑。这说明作者更关心地点和故事是否关联，而不是软件能否从零画出山川。</p>
+      <p><strong>判断：</strong>第一版只做底图上传、图层、地点标记、地点关联人物与章节。不要投入完整地形绘制、笔刷和奇迹式地图生成，否则研发成本会吞掉写作主线的资源。</p>
+
+      <h3>6.6 武器与物品：保留需求，但不要做窄</h3>
+      <p>商业世界构建产品普遍使用通用条目或自定义字段管理物品。bibisco 也把地点、物品作为故事元素管理。单独做一个“武器”顶级导航，只适合武器是核心玩法的作品，不适合通用写作平台。</p>
+      <p><strong>判断：</strong>保留武器模板，但归入“物品/设定条目”体系；武器可以预置持有者、状态、材质、能力和来源，未来防具、法宝、丹药也能复用同一结构。</p>
+
+      <h3>6.7 账户与数据：这是龙吟最清晰的差异，也是最重的责任</h3>
+      <p>商业产品默认账户数据在厂商云端；开源写作软件大多默认单用户本地文件。自托管的 novel-it、novel-app 等已经开始解决账户隔离和反向代理访问，但项目非常早期。</p>
+      <p>龙吟把账户设为必须入口，并把数据放在用户自己的本地服务器，提供了第三条路线：<strong>账户可跨设备使用，数据不交给厂商，网络范围由作者自己决定。</strong>这不是一句部署说明，而是产品价值主张，必须在首页、账户页、导出与备份流程中保持一致。</p>
+    </section>
+
+    <section id="position">
+      <h2>07 龙吟的机会与差异化</h2>
+      <h3>7.1 可被市场验证的优势</h3>
+      <div class="cards">
+        <div class="card"><h3>自有服务器上的账户数据</h3><p>比传统本地软件更方便访问，比商业云软件更强调数据掌控。竞品中已有早期探索，但没有成熟的一体化体验。</p></div>
+        <div class="card"><h3>共享原件＋作品扩展</h3><p>Novelcrafter 系列共享和 Wolfden 的宇宙/系列/书层级都在证明这一需求。龙吟可用明确的覆盖规则避免复制和污染。</p></div>
+        <div class="card"><h3>能随剧情变化的关系</h3><p>Campfire 已有关系与故事弧，但“关系状态按作品和卷章生效”仍适合长篇连载和系列小说。</p></div>
+      </div>
+
+      <h3>7.2 不构成差异化的地方</h3>
+      <ul>
+        <li>人物关系图：Campfire、World Anvil、51mazi 都有类似能力。</li>
+        <li>地图钉点：Campfire 与 LegendKeeper 已较成熟。</li>
+        <li>章节大纲：Plottr、Scrivener、Manuskript 等普遍具备。</li>
+        <li>人物档案、时间线、素材整理：大量写作软件已覆盖。</li>
+        <li>AI 续写与整本生成：开源市场供给拥挤，且与龙吟的手动创作定位不一致。</li>
+      </ul>
+
+      <h3>7.3 建议的产品定位</h3>
+      <div class="callout">
+        <span class="callout-label">定位表述</span>
+        <p><strong>龙吟写作是面向长篇与系列小说作者的结构化创作工作台：账户数据运行在作者自己的服务器上，人物、地点、物品、素材与正文始终互相引用，关系随作品和剧情阶段变化。</strong></p>
+      </div>
+      <p>目标用户应优先是长篇连载作者、系列小说作者和重视资料掌控的成熟作者。不要先服务“所有写作者”，也不要先与 AI 自动生成工具争夺同一批用户。</p>
+    </section>
+
+    <section id="risks">
+      <h2>08 风险与取舍</h2>
+      <h3>8.1 功能范围过大</h3>
+      <p>六个模块加上大纲、设定库和正文工程，实际上已经是多个商业产品的合集。若每个模块都做浅层 CRUD，会在任何一个专业竞品面前都不占优势。应围绕“章节写作时需要什么”决定模块深度，而不是按功能清单平均投入。</p>
+
+      <h3>8.2 自有服务器带来运维和安全责任</h3>
+      <p>外网访问意味着登录入口暴露在公网。至少需要账户隔离、强密码与登录限流、会话失效、CSRF 防护、TLS 终止、访问日志、定期备份和恢复演练。服务器是用户自己的，不代表安全问题会自动消失；一旦作品丢失，用户仍会归因于产品。</p>
+
+      <h3>8.3 共享库的所有权歧义</h3>
+      <p>共享人物在 A 作品中被修改时，不能改变 B 作品已经依赖的事实。当前“共享原件＋作品扩展”的方向正确，但 UI 必须明确显示正在编辑哪一层，并阻止用户误以为修改了共享原件。删除共享人物前也要检查所有作品中的引用关系。</p>
+
+      <h3>8.4 地图成本失控</h3>
+      <p>地图如果从“上传底图和标点”扩展到“绘制山川、自动生成城市、势力范围动画”，就会变成独立产品。第一版应严格限定为底图、图层、标记和关联，并用真实作品验证使用频率后再扩展。</p>
+
+      <h3>8.5 数据迁移不及竞品</h3>
+      <p>Kindling 已把从 Scrivener、Plottr、yWriter、Obsidian 导入作为卖点。龙吟若没有完整导出、备份和导入能力，作者不会愿意把长篇作品迁入。账户与服务器模式不能成为数据锁定。</p>
+
+      <h3>8.6 AI 既不能忽视，也不该成为主线</h3>
+      <p>GitHub 新项目的增长高度集中在 AI 生成。龙吟若完全不提供辅助，未来可能被视作传统工具；若过早投入生成，又会稀释“作者掌控和结构化创作”的定位。合理顺序是先让设定和正文形成可检索的上下文，再考虑可选的资料问答、连续性和措辞检查。</p>
+    </section>
+
+    <section id="priority">
+      <h2>09 落地优先级建议</h2>
+      <p>排序依据不是模块数量，而是竞品已经证明的用户底线和龙吟真正能形成差异的部分。</p>
+      <div class="priority">
+        <div class="priority-row"><div class="priority-code">P0</div><div class="priority-title">账户、服务器与写作闭环</div><div class="priority-desc">账户隔离与登录、作品列表、纯文本或 Markdown 正文、自动保存、历史快照、全文查找、完整备份与导出。没有这条闭环，其他模块没有承载基础。</div></div>
+        <div class="priority-row"><div class="priority-code">P0</div><div class="priority-title">三级故事大纲</div><div class="priority-desc">故事总纲、分卷结构、章节卡与场景节拍。章节卡可关联人物、地点和资料，能直接进入正文。</div></div>
+        <div class="priority-row"><div class="priority-code">P1</div><div class="priority-title">共享设定库与人物关系</div><div class="priority-desc">共享原件与作品扩展分离；关系以人物对为锚点，记录方向、归属与生效阶段。提供列表主视图和关系图辅助视图。</div></div>
+        <div class="priority-row"><div class="priority-code">P1</div><div class="priority-title">素材引用与反向查找</div><div class="priority-desc">素材按账户共享，作品保存笔记和章节引用；任意设定能反查被哪些章节使用。</div></div>
+        <div class="priority-row"><div class="priority-code">P2</div><div class="priority-title">地图与物品模板</div><div class="priority-desc">地图先做上传底图、图层、标记和关联；武器改成通用物品模板的一个预置类型，避免孤立模块。</div></div>
+        <div class="priority-row"><div class="priority-code">P3</div><div class="priority-title">可选的连续性辅助</div><div class="priority-desc">在已有设定和正文之上提供检索、时间线冲突提示和措辞建议。不要以自动生成整章作为核心卖点。</div></div>
+      </div>
+      <div class="callout warning">
+        <span class="callout-label">优先级中的取舍</span>
+        <p>地图和武器不是第一版的核心壁垒，但会被用户用来判断“是不是完整”。因此它们可以做，但必须受控在模板、标记和关联范围内，不能变成独立编辑器。</p>
+      </div>
+    </section>
+
+    <section id="validation">
+      <h2>10 上线前验证清单</h2>
+      <ol>
+        <li><strong>写作闭环验证：</strong>让作者从新建作品开始，完成大纲、三章正文、资料关联和历史恢复，全程不使用外部编辑器。</li>
+        <li><strong>共享库验证：</strong>用两部共享同一人物的作品检验：修改共享原件、添加作品扩展、删除引用和反查影响范围是否清楚。</li>
+        <li><strong>关系规模验证：</strong>在一个作品中建立至少 30 个人物和 80 条关系，验证筛选、阶段切换和列表性能；确认关系图不是唯一入口。</li>
+        <li><strong>地图规模验证：</strong>在单张底图上放置至少 100 个地点标记，验证缩放、图层开关和关联详情的响应速度。</li>
+        <li><strong>迁移验证：</strong>完成 Markdown/JSON/附件导出，再从导出包重新导入，确保正文、关联和附件不丢失。</li>
+        <li><strong>外网安全验证：</strong>通过反向代理从公网登录，检查未登录访问、跨账户越权、暴力尝试、会话过期和备份恢复。</li>
+        <li><strong>用户价值验证：</strong>重点观察作者是否真的使用人物关系、地图和武器，而不是只在大纲和正文之间切换；低使用模块应合并，而不是继续扩张。</li>
+      </ol>
+    </section>
+
+    <section id="sources">
+      <h2>11 资料来源</h2>
+      <h3>GitHub 项目</h3>
+      <ol class="source-list">
+        <li><a href="https://github.com/saga-soft/novelWriter">saga-soft/novelWriter</a></li>
+        <li><a href="https://github.com/olivierkes/manuskript">olivierkes/manuskript</a></li>
+        <li><a href="https://github.com/andreafeccomandi/bibisco">andreafeccomandi/bibisco</a></li>
+        <li><a href="https://github.com/xiaoshengxianjun/51mazi">xiaoshengxianjun/51mazi</a></li>
+        <li><a href="https://github.com/TaylliSun/worldcraft-codex">TaylliSun/worldcraft-codex</a></li>
+        <li><a href="https://github.com/EthanYoQ/AI-Novel-Writer">EthanYoQ/AI-Novel-Writer</a></li>
+        <li><a href="https://github.com/uu201/character-arc">uu201/character-arc</a></li>
+        <li><a href="https://github.com/smith-and-web/kindling">smith-and-web/kindling</a></li>
+        <li><a href="https://github.com/david-hollingworth/novel-it">david-hollingworth/novel-it</a></li>
+        <li><a href="https://github.com/gelijunge22-code/novel-app">gelijunge22-code/novel-app</a></li>
+        <li><a href="https://github.com/gavin-wolfe/wolfden">gavin-wolfe/wolfden</a></li>
+        <li><a href="https://github.com/wavemakercards/wavemaker-v3">wavemakercards/wavemaker-v3</a></li>
+        <li><a href="https://github.com/zenstory-ai/oh-story-claudecode">zenstory-ai/oh-story-claudecode</a></li>
+        <li><a href="https://github.com/PenglongHuang/chinese-novelist-skill">PenglongHuang/chinese-novelist-skill</a></li>
+        <li><a href="https://github.com/topics/writing-app">GitHub topic: writing-app</a></li>
+        <li><a href="https://github.com/topics/novel-writing">GitHub topic: novel-writing</a></li>
+      </ol>
+      <h3>商业产品与官方文档</h3>
+      <ol class="source-list" start="17">
+        <li><a href="https://campfirewriting.com/write">Campfire Writing</a>；<a href="https://campfirewriting.com/learn/maps-tutorial">Maps Module</a>；<a href="https://campfirewriting.com/learn/relationships-tutorial">Relationships Module</a>；<a href="https://campfirewriting.com/learn/timeline-tutorial">Timeline Module</a></li>
+        <li><a href="https://www.worldanvil.com/worldbuilding-software">World Anvil Worldbuilding Software</a>；<a href="https://www.worldanvil.com/features/family-trees">Family Trees</a></li>
+        <li><a href="https://www.novelcrafter.com/features">Novelcrafter Features</a>；<a href="https://www.novelcrafter.com/features/codex">Codex</a></li>
+        <li><a href="https://plottr.com/features/">Plottr Features</a>；<a href="https://plottr.com/pricing/">Plottr Pricing / Cloud Sync</a></li>
+        <li><a href="https://www.literatureandlatte.com/scrivener/overview">Scrivener Overview</a></li>
+        <li><a href="https://bibisco.com/writer-software-bibisco-features/">bibisco Features</a>；<a href="https://bibisco.com/docs/how-to-install-bibisco-on-android/">bibisco Everywhere同步说明</a></li>
+        <li><a href="https://obsidian.md/">Obsidian</a>；<a href="https://www.obsidianstats.com/plugins/longform">Longform 插件</a></li>
+        <li><a href="https://www.legendkeeper.com/">LegendKeeper</a></li>
+      </ol>
+    </section>
+
+    <section id="limits">
+      <h2>12 调研限制</h2>
+      <ul>
+        <li>本报告于 2026-10-30 完成快照，GitHub 的 star、更新时间和项目状态会持续变化。</li>
+        <li>闭源产品只能依据官方页面判断，无法确认其内部字段、权限模型和数据导出限制。</li>
+        <li>“未见”或“未突出”表示本轮公开资料未说明，不等同于产品绝对不支持。</li>
+        <li>本报告未包含用户访谈、付费意愿、留存和真实写作行为数据，不能代替产品验证。</li>
+        <li>开源代码许可证各不相同，包括 GPL、AGPL、MIT 等；可借鉴交互与概念，但复用代码前必须单独确认许可证义务。</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>龙吟写作 · 同类产品调研与竞品分析报告 · 资料快照 2026-10-30</footer>
+</body>
+</html>

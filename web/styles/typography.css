@@ -1,0 +1,31 @@
+/* 龙吟写作 · 阅读排版 */
+.typography-body { padding: 10px 8px 18px; }
+.chapter-prose {
+  max-width: var(--reading-measure);
+  margin: 0 auto;
+  color: var(--ink-editor);
+  font-family: var(--font-reading);
+  font-size: var(--reading-size);
+  line-height: var(--reading-line);
+  letter-spacing: var(--reading-letter);
+  text-align: justify;
+  text-justify: inter-character;
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hanging-punctuation: allow-end;
+}
+.chapter-prose p { margin: 0; text-indent: var(--reading-indent); }
+.chapter-prose p + p { margin-top: 0; }
+.chapter-prose .prose-structural { margin: .6em 0; text-indent: 0; color: var(--secondary); }
+.chapter-prose .prose-structural:first-child { margin-top: 0; }
+@supports (text-autospace: normal) {
+  .chapter-prose { text-autospace: ideograph-alpha ideograph-numeric; }
+}
+@supports (text-spacing-trim: normal) {
+  .chapter-prose { text-spacing-trim: normal; }
+}
+@media (max-width: 720px) {
+  .typography-body { padding: 6px 2px 12px; }
+  .chapter-prose { font-size: var(--text-17); line-height: 1.9; }
+}

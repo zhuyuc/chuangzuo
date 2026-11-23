@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>龙吟写作 · 视觉与交互升级调研方案</title>
+<style>
+  :root{
+    --ink:#111915;
+    --ink-2:#17231c;
+    --ink-3:#203027;
+    --cream:#f3efe5;
+    --paper:#fbf8f0;
+    --paper-2:#eee8db;
+    --text:#242b26;
+    --muted:#687168;
+    --faint:#90988e;
+    --line:#d9d3c6;
+    --line-dark:rgba(233,232,220,.13);
+    --jade:#356f57;
+    --jade-2:#7eae92;
+    --jade-pale:#dfeade;
+    --brass:#ad874b;
+    --brass-pale:#eadcc0;
+    --seal:#a94c3e;
+    --danger:#a34f46;
+    --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong",serif;
+    --sans:"Noto Sans SC","Source Han Sans SC","MiSans","Microsoft YaHei",sans-serif;
+    --ease:cubic-bezier(.22,1,.36,1);
+    --spring:cubic-bezier(.34,1.56,.64,1);
+    --shadow-1:0 1px 2px rgba(28,32,24,.07);
+    --shadow-2:0 18px 50px rgba(28,32,24,.14);
+    --shadow-3:0 34px 90px rgba(6,14,10,.34);
+    --max:1240px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 8% 2%,rgba(173,135,75,.10),transparent 24rem),
+      linear-gradient(180deg,#f3efe5,#f8f5ed 42%,#f1ece1);
+    color:var(--text);
+    font-family:var(--sans);
+    font-size:15px;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--jade);text-decoration-thickness:1px;text-underline-offset:3px}
+  a:hover{color:#1f4f3c}
+  ::selection{background:rgba(53,111,87,.18)}
+  .shell{width:min(var(--max),calc(100% - 48px));margin:0 auto}
+  .topbar{
+    position:sticky;top:0;z-index:30;
+    background:rgba(243,239,229,.82);
+    backdrop-filter:blur(16px) saturate(1.1);
+    border-bottom:1px solid rgba(51,63,53,.1);
+  }
+  .topbar .shell{height:62px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:.03em}
+  .brand-mark{width:30px;height:30px;display:grid;place-items:center;border-radius:8px;background:var(--ink);color:#dce8de;font-family:var(--serif);font-size:17px;box-shadow:var(--shadow-1)}
+  .topnav{display:flex;gap:4px;align-items:center}
+  .topnav a{padding:7px 10px;border-radius:6px;color:var(--muted);font-size:12px;text-decoration:none;transition:background .2s,color .2s}
+  .topnav a:hover{background:rgba(53,111,87,.07);color:var(--jade)}
+  .topnav .current{color:var(--jade);background:rgba(53,111,87,.08);font-weight:600}
+  .hero{
+    position:relative;overflow:hidden;
+    background:
+      radial-gradient(ellipse at 76% 24%,rgba(101,157,126,.19),transparent 26rem),
+      radial-gradient(ellipse at 15% 110%,rgba(173,135,75,.16),transparent 34rem),
+      linear-gradient(135deg,#101813 0%,#14231b 48%,#1d3025 100%);
+    color:#ebece4;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.32;
+    background-image:
+      linear-gradient(rgba(238,240,229,.035) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(238,240,229,.035) 1px,transparent 1px);
+    background-size:36px 36px;
+    mask-image:linear-gradient(180deg,rgba(0,0,0,.55),transparent 86%);
+  }
+  .hero::after{
+    content:"";position:absolute;width:620px;height:620px;right:-160px;top:-260px;border-radius:50%;
+    background:radial-gradient(circle,rgba(147,188,163,.15),transparent 66%);
+    animation:drift 16s ease-in-out infinite alternate;
+  }
+  @keyframes drift{to{transform:translate3d(-60px,40px,0) scale(1.08)}}
+  .hero .shell{position:relative;z-index:1;padding:78px 0 68px}
+  .eyebrow{display:flex;align-items:center;gap:10px;color:#9eb8a7;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+  .eyebrow::before{content:"";width:34px;height:1px;background:#7c9a88}
+  .hero h1{
+    max-width:930px;margin:24px 0 20px;
+    font-family:var(--serif);font-size:clamp(40px,5.6vw,70px);line-height:1.22;font-weight:600;letter-spacing:-.025em;
+  }
+  .hero h1 em{font-style:normal;color:#c5dfcd}
+  .hero-lead{max-width:760px;margin:0;color:#aebbb2;font-size:16px;line-height:1.95}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:30px}
+  .hero-meta span{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid rgba(218,231,220,.17);border-radius:999px;background:rgba(255,255,255,.035);color:#c0cbc2;font-size:11px}
+  .hero-meta b{color:#d8e2d9;font-weight:600}
+  .hero-foot{display:grid;grid-template-columns:1.35fr 1fr;gap:30px;align-items:end;margin-top:54px}
+  .hero-thesis{border-left:1px solid rgba(215,229,217,.24);padding-left:20px;color:#d9e2da;font-family:var(--serif);font-size:21px;line-height:1.65}
+  .hero-sign{justify-self:end;text-align:right;color:#8fa698;font-size:11px;line-height:1.8}
+  .hero-sign strong{display:block;color:#d8e2d9;font-size:12px;letter-spacing:.08em}
+  main{padding:0 0 90px}
+  .section{padding:76px 0 0}
+  .section-head{display:grid;grid-template-columns:150px minmax(0,1fr);gap:28px;align-items:start;margin-bottom:34px}
+  .section-no{color:var(--faint);font-family:var(--serif);font-size:12px;letter-spacing:.14em;padding-top:5px}
+  .section-head h2{margin:0;font-family:var(--serif);font-size:clamp(28px,3.3vw,42px);line-height:1.34;font-weight:600;letter-spacing:-.02em}
+  .section-head p{max-width:820px;margin:10px 0 0;color:var(--muted);font-size:14px}
+  .kicker{display:inline-flex;align-items:center;gap:7px;margin-bottom:10px;color:var(--jade);font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
+  .kicker::before{content:"";width:18px;height:1px;background:var(--jade)}
+  .panel{background:rgba(251,248,240,.76);border:1px solid rgba(61,74,62,.12);border-radius:12px;box-shadow:var(--shadow-1)}
+  .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .summary-card{padding:26px 24px 24px;min-height:190px;position:relative;overflow:hidden;background:linear-gradient(160deg,rgba(251,248,240,.94),rgba(241,236,225,.72))}
+  .summary-card::after{content:"";position:absolute;right:-36px;bottom:-42px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(53,111,87,.12),transparent 68%)}
+  .summary-card .num{color:var(--brass);font-family:var(--serif);font-size:12px;letter-spacing:.12em}
+  .summary-card h3{margin:16px 0 8px;font-family:var(--serif);font-size:22px;line-height:1.4;font-weight:600}
+  .summary-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.85}
+  .verdict{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:16px}
+  .verdict-main{padding:30px;background:var(--ink);color:#e6e9e1;border-color:rgba(255,255,255,.08);box-shadow:var(--shadow-2);position:relative;overflow:hidden}
+  .verdict-main::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 84% 10%,rgba(97,155,122,.18),transparent 42%);pointer-events:none}
+  .verdict-main h3{position:relative;margin:0 0 12px;font-family:var(--serif);font-size:25px;font-weight:600}
+  .verdict-main p{position:relative;margin:0;color:#aebbb1;font-size:13px;line-height:1.95}
+  .verdict-side{display:grid;gap:10px}
+  .mini-stat{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:18px;background:rgba(251,248,240,.78);border:1px solid rgba(61,74,62,.12);border-radius:9px}
+  .mini-stat span{color:var(--muted);font-size:11px}
+  .mini-stat strong{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink)}
+  .evidence{display:grid;grid-template-columns:1.35fr .65fr;gap:18px;align-items:stretch}
+  .shot{overflow:hidden;border-radius:10px;border:1px solid rgba(33,42,34,.16);background:#0b110d;box-shadow:var(--shadow-2)}
+  .shot img{display:block;width:100%;height:auto}
+  .caption{padding:11px 14px;color:#8d9a91;background:#101713;font-size:10px;line-height:1.7}
+  .caption b{color:#c6d0c7;font-weight:600}
+  .evidence-note{padding:28px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(160deg,#19251e,#111915);color:#dfe5dd;border-radius:10px;box-shadow:var(--shadow-2)}
+  .evidence-note h3{margin:0 0 12px;font-family:var(--serif);font-size:23px;line-height:1.45;font-weight:600}
+  .evidence-note p{margin:0;color:#9ea9a0;font-size:12px;line-height:1.9}
+  .evidence-note ul{margin:20px 0 0;padding:0;list-style:none;display:grid;gap:9px}
+  .evidence-note li{padding-top:9px;border-top:1px solid rgba(255,255,255,.08);color:#c8d1c9;font-size:11px}
+  .evidence-note li b{color:#d9b777;font-family:var(--serif);margin-right:6px}
+  .principles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}
+  .principle{padding:20px;border:1px solid rgba(61,74,62,.12);border-radius:9px;background:rgba(251,248,240,.64)}
+  .principle .idx{color:var(--brass);font-size:10px;letter-spacing:.12em}
+  .principle h4{margin:7px 0 5px;font-size:14px}
+  .principle p{margin:0;color:var(--muted);font-size:11px;line-height:1.8}
+  .table-wrap{overflow:auto;border:1px solid rgba(61,74,62,.13);border-radius:10px;background:rgba(251,248,240,.78);box-shadow:var(--shadow-1)}
+  table{width:100%;border-collapse:collapse;min-width:760px}
+  th,td{padding:13px 16px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(61,74,62,.09);font-size:12px;line-height:1.7}
+  th{background:rgba(53,111,87,.055);color:var(--jade);font-weight:600;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+  tr:last-child td{border-bottom:0}
+  td:first-child{font-weight:600;color:var(--text)}
+  .tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;font-size:9px;line-height:1.6;white-space:nowrap}
+  .tag.ok{background:var(--jade-pale);color:var(--jade)}
+  .tag.warn{background:#f0e4cd;color:#85642d}
+  .tag.no{background:#f1dfdb;color:#8a463e}
+  .audit-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:18px}
+  .audit-stack{display:grid;gap:14px}
+  .audit-shot{padding:8px;background:#e8e3d7;border:1px solid rgba(61,74,62,.13);border-radius:10px}
+  .audit-shot img{display:block;width:100%;border-radius:6px}
+  .audit-shot .shot-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:9px 4px 2px;color:var(--faint);font-size:10px}
+  .issues{display:grid;gap:0;border:1px solid rgba(61,74,62,.13);border-radius:10px;overflow:hidden;background:rgba(251,248,240,.72);box-shadow:var(--shadow-1)}
+  .issue{display:grid;grid-template-columns:40px 1fr;gap:14px;padding:17px 18px;border-bottom:1px solid rgba(61,74,62,.09)}
+  .issue:last-child{border-bottom:0}
+  .issue .severity{width:24px;height:24px;display:grid;place-items:center;border-radius:50%;font-family:var(--serif);font-size:11px;color:#fff;margin-top:2px}
+  .issue.high .severity{background:var(--seal)}
+  .issue.medium .severity{background:var(--brass)}
+  .issue.low .severity{background:var(--jade)}
+  .issue h4{margin:0 0 4px;font-size:13px}
+  .issue p{margin:0;color:var(--muted);font-size:11px;line-height:1.8}
+  .keep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+  .keep{padding:18px;border-top:2px solid var(--jade);background:rgba(251,248,240,.6)}
+  .keep strong{display:block;margin-bottom:5px;font-size:12px}
+  .keep span{color:var(--muted);font-size:10px;line-height:1.75}
+  .direction{
+    position:relative;margin-top:20px;padding:54px 48px;border-radius:16px;overflow:hidden;color:#e9ece4;
+    background:
+      radial-gradient(circle at 76% 18%,rgba(137,183,154,.16),transparent 24rem),
+      radial-gradient(circle at 8% 105%,rgba(173,135,75,.13),transparent 26rem),
+      linear-gradient(135deg,#0f1712,#18261e 56%,#1e3126);
+    box-shadow:var(--shadow-3)
+  }
+  .direction::before{content:"";position:absolute;inset:0;opacity:.3;background-image:radial-gradient(rgba(238,240,229,.16) .6px,transparent .6px);background-size:17px 17px;mask-image:linear-gradient(120deg,#000,transparent 70%)}
+  .direction>*{position:relative}
+  .direction .kicker{color:#a9c3b1}
+  .direction .kicker::before{background:#a9c3b1}
+  .direction h2{margin:8px 0 10px;font-family:var(--serif);font-size:clamp(34px,4.3vw,56px);line-height:1.2;font-weight:600}
+  .direction .lead{max-width:780px;margin:0;color:#a8b5ab;font-size:14px;line-height:1.9}
+  .laws{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:34px}
+  .law{padding:18px;border:1px solid rgba(228,236,226,.12);background:rgba(255,255,255,.035);border-radius:8px}
+  .law b{display:block;color:#d9c08d;font-family:var(--serif);font-size:15px;margin-bottom:5px}
+  .law span{color:#9ba89e;font-size:11px;line-height:1.8}
+  .concept{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:stretch;margin-top:18px}
+  .concept-stage{position:relative;min-height:460px;padding:42px;border-radius:12px;overflow:hidden;background:linear-gradient(145deg,#0f1712,#1b2b21);box-shadow:var(--shadow-2);perspective:1000px}
+  .concept-stage::before{content:"";position:absolute;width:380px;height:380px;left:8%;top:15%;border-radius:50%;background:radial-gradient(circle,rgba(205,172,109,.19),transparent 67%);filter:blur(6px)}
+  .concept-book{
+    position:relative;width:245px;height:336px;margin:20px auto 0;padding:30px 26px;border-radius:5px 13px 13px 5px;
+    color:#e9e8dc;background:
+      linear-gradient(90deg,rgba(0,0,0,.42),transparent 12%,transparent 86%,rgba(255,255,255,.055)),
+      radial-gradient(circle at 72% 10%,rgba(111,161,133,.22),transparent 32%),
+      linear-gradient(145deg,#263d2f,#16241b 62%,#111b14);
+    border:1px solid rgba(204,216,201,.17);
+    box-shadow:14px 24px 46px rgba(2,7,4,.46),inset 9px 0 18px rgba(0,0,0,.22);
+    transform:rotateY(var(--ry,0deg)) rotateX(var(--rx,0deg));
+    transition:transform .35s var(--ease);
+    transform-style:preserve-3d;
+    cursor:pointer;
+  }
+  .concept-book::after{content:"";position:absolute;left:11px;top:8px;bottom:8px;width:1px;background:rgba(222,221,202,.14)}
+  .concept-book .book-kind{font-size:9px;letter-spacing:.18em;color:#a6b8a9}
+  .concept-book h3{margin:70px 0 10px;font-family:var(--serif);font-size:32px;font-weight:600;letter-spacing:.08em;line-height:1.35}
+  .concept-book p{margin:0;color:#9cac9f;font-size:11px}
+  .concept-book .seal{position:absolute;right:22px;bottom:24px;width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(188,104,86,.62);color:#d39080;font-family:var(--serif);font-size:12px;transform:rotate(-5deg)}
+  .concept-book .book-line{position:absolute;left:26px;right:26px;bottom:72px;height:1px;background:rgba(218,229,218,.15)}
+  .concept-book .book-line i{display:block;width:38%;height:100%;background:#a9c7b1}
+  .concept-book .chapter{margin-top:14px;color:#becbc1;font-size:10px;line-height:1.6}
+  .concept-paper{display:flex;align-items:center;justify-content:center;padding:42px;background:#ddd6c7;border-radius:12px;box-shadow:inset 0 1px rgba(255,255,255,.55)}
+  .paper-sheet{width:min(100%,430px);min-height:370px;padding:38px 40px;background:linear-gradient(180deg,#fffdf7,#f7f2e7);border:1px solid #d8d0bf;box-shadow:0 22px 50px rgba(73,65,48,.16);position:relative}
+  .paper-sheet::before{content:"";position:absolute;left:17px;top:0;bottom:0;width:1px;background:rgba(179,155,113,.16)}
+  .paper-sheet small{display:block;color:#8f8a7e;font-size:9px;letter-spacing:.08em}
+  .paper-sheet h3{margin:9px 0 22px;font-family:var(--serif);font-size:25px;line-height:1.4;font-weight:600;color:#252a24}
+  .paper-sheet p{margin:0 0 15px;color:#50564f;font-family:var(--serif);font-size:14px;line-height:2;text-indent:2em}
+  .paper-sheet .paper-foot{display:flex;justify-content:space-between;align-items:center;margin-top:30px;padding-top:12px;border-top:1px solid #e4ddcf;color:#9a9385;font-size:9px}
+  .paper-sheet .paper-foot b{color:var(--jade);font-weight:600}
+  .theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+  .theme-card{position:relative;overflow:hidden;padding:24px;border-radius:10px;min-height:190px}
+  .theme-light{background:linear-gradient(145deg,#f8f4e9,#e7e0d2);border:1px solid #d7d0c1;color:#273029}
+  .theme-dark{background:linear-gradient(145deg,#101713,#1b2820);border:1px solid rgba(255,255,255,.08);color:#e4e8e0}
+  .theme-card .theme-label{font-size:10px;letter-spacing:.13em;text-transform:uppercase;opacity:.55}
+  .theme-card h4{margin:32px 0 3px;font-family:var(--serif);font-size:23px;font-weight:600}
+  .theme-card p{margin:0;font-size:11px;opacity:.65}
+  .swatches{display:flex;gap:6px;margin-top:20px}
+  .swatches i{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.36);box-shadow:0 3px 9px rgba(0,0,0,.08)}
+  .token-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .token-card{padding:22px;border:1px solid rgba(61,74,62,.12);border-radius:9px;background:rgba(251,248,240,.7)}
+  .token-card h4{margin:0 0 12px;font-size:12px;color:var(--jade)}
+  .type-specimen{border-bottom:1px solid rgba(61,74,62,.1);padding:0 0 14px;margin-bottom:14px}
+  .type-specimen .display{font-family:var(--serif);font-size:31px;line-height:1.45;font-weight:600}
+  .type-specimen .body{margin-top:7px;color:var(--muted);font-size:14px;line-height:1.9}
+  .token-list{display:grid;gap:7px;margin:0;padding:0;list-style:none}
+  .token-list li{display:flex;justify-content:space-between;gap:18px;color:var(--muted);font-size:10px;padding-bottom:6px;border-bottom:1px dashed rgba(61,74,62,.09)}
+  .token-list li:last-child{border-bottom:0;padding-bottom:0}
+  .token-list b{color:var(--text);font-weight:500;font-family:ui-monospace,Consolas,monospace;font-size:10px}
+  .page-map{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .page-plan{padding:21px 20px;border:1px solid rgba(61,74,62,.12);border-radius:9px;background:rgba(251,248,240,.68)}
+  .page-plan .plan-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+  .page-plan h3{margin:0;font-family:var(--serif);font-size:18px;font-weight:600}
+  .page-plan .plan-head span{color:var(--faint);font-size:9px;letter-spacing:.08em}
+  .page-plan p{margin:0 0 10px;color:var(--muted);font-size:11px;line-height:1.8}
+  .page-plan ul{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+  .page-plan li{position:relative;padding-left:11px;color:#50594f;font-size:10px;line-height:1.75}
+  .page-plan li::before{content:"";position:absolute;left:0;top:.68em;width:4px;height:4px;border-radius:50%;background:var(--jade-2)}
+  .page-plan .avoid{margin-top:10px;padding-top:9px;border-top:1px dashed rgba(61,74,62,.11);color:#987d58;font-size:10px}
+  .motion-list{display:grid;gap:0;margin-top:16px;border:1px solid rgba(61,74,62,.12);border-radius:10px;overflow:hidden;background:rgba(251,248,240,.7)}
+  .motion-row{display:grid;grid-template-columns:180px 1fr 150px;gap:16px;padding:14px 17px;border-bottom:1px solid rgba(61,74,62,.09);align-items:start}
+  .motion-row:last-child{border-bottom:0}
+  .motion-row strong{font-size:11px}
+  .motion-row span{color:var(--muted);font-size:10px;line-height:1.8}
+  .motion-row code{justify-self:end;color:var(--brass);font-family:ui-monospace,Consolas,monospace;font-size:9px;white-space:nowrap}
+  .roadmap{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+  .phase{padding:22px;border:1px solid rgba(61,74,62,.12);border-radius:9px;background:rgba(251,248,240,.72);position:relative;overflow:hidden}
+  .phase::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--phase-color)}
+  .phase.p0{--phase-color:#a94c3e}
+  .phase.p1{--phase-color:#ad874b}
+  .phase.p2{--phase-color:#356f57}
+  .phase .phase-tag{font-size:9px;letter-spacing:.15em;color:var(--phase-color);font-weight:700}
+  .phase h3{margin:11px 0 6px;font-family:var(--serif);font-size:20px;font-weight:600}
+  .phase p{margin:0 0 12px;color:var(--muted);font-size:10px}
+  .phase ul{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+  .phase li{padding-top:7px;border-top:1px solid rgba(61,74,62,.08);color:#4f584f;font-size:10px;line-height:1.7}
+  .phase .estimate{display:block;margin-top:15px;color:var(--faint);font-size:9px}
+  .acceptance{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .accept{padding:22px;border:1px solid rgba(61,74,62,.12);border-radius:9px;background:rgba(251,248,240,.68)}
+  .accept h3{margin:0 0 9px;font-size:12px;color:var(--jade)}
+  .accept ul{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+  .accept li{color:var(--muted);font-size:10px;line-height:1.75;padding-left:13px;position:relative}
+  .accept li::before{content:"○";position:absolute;left:0;color:var(--brass);font-size:8px;top:2px}
+  .risk{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:16px}
+  .risk-main{padding:24px;border-radius:10px;background:var(--ink);color:#dce4dc;box-shadow:var(--shadow-2)}
+  .risk-main h3{margin:0 0 10px;font-family:var(--serif);font-size:21px}
+  .risk-main p{margin:0;color:#a3b0a5;font-size:11px;line-height:1.9}
+  .no-list{display:grid;gap:8px}
+  .no-list span{padding:10px 12px;border-radius:6px;background:#f0e5da;color:#7e5f44;font-size:10px;line-height:1.7}
+  .source-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .source{padding:17px 18px;border:1px solid rgba(61,74,62,.12);border-radius:8px;background:rgba(251,248,240,.65)}
+  .source small{display:block;color:var(--faint);font-size:9px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+  .source a{font-size:11px;word-break:break-all}
+  .footer{margin-top:74px;padding:28px 0 10px;border-top:1px solid rgba(61,74,62,.13);display:flex;justify-content:space-between;gap:24px;color:var(--faint);font-size:10px}
+  .footer strong{color:var(--text);font-family:var(--serif);font-size:13px;font-weight:600}
+  @media (max-width:980px){
+    .section-head{grid-template-columns:1fr;gap:10px}
+    .summary-grid,.laws,.roadmap{grid-template-columns:1fr}
+    .verdict,.evidence,.audit-grid,.concept,.theme-grid,.token-grid,.page-map,.acceptance,.risk,.source-list{grid-template-columns:1fr}
+    .hero-foot{grid-template-columns:1fr;align-items:start}
+    .hero-sign{justify-self:start;text-align:left}
+    .topnav{display:none}
+    .motion-row{grid-template-columns:1fr;gap:5px}
+    .motion-row code{justify-self:start}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="shell">
+    <div class="brand"><span class="brand-mark">龙</span><span>龙吟写作 · 设计研究</span></div>
+    <nav class="topnav" aria-label="报告目录">
+      <a class="current" href="#summary">结论</a>
+      <a href="#reference">参考项目</a>
+      <a href="#audit">现状审计</a>
+      <a href="#direction">视觉方向</a>
+      <a href="#pages">页面改造</a>
+      <a href="#roadmap">落地计划</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="shell">
+    <div class="eyebrow">Visual research · 2026.11.02</div>
+    <h1>让每天打开的写作工具，<br>像一张<em>值得坐下来的书桌</em>。</h1>
+    <p class="hero-lead">对 visualization-collection 的视觉机制拆解，以及龙吟写作从“功能完整的工具”升级为“有作者气质的写作空间”的完整方案。目标不是更花哨，而是更有层级、更有记忆点、更让人想继续写下去。</p>
+    <div class="hero-meta">
+      <span><b>参考</b> hepengwei/visualization-collection</span>
+      <span><b>对象</b> 工作台 / 写作 / 大纲 / 资料 / 世界</span>
+      <span><b>原则</b> 借机制，不照搬皮肤</span>
+    </div>
+    <div class="hero-foot">
+      <div class="hero-thesis">视觉升级的核心不是加装饰，而是建立“书壳与纸张”的空间关系，让当前作品成为屏幕上的唯一主角。</div>
+      <div class="hero-sign"><strong>龙吟设计研究</strong>调研 / 审计 / 方向 / 落地<br>内部方案 · v1</div>
+    </div>
+  </div>
+</section>
+
+<main class="shell">
+  <section class="section" id="summary">
+    <div class="section-head">
+      <div class="section-no">01 / 结论</div>
+      <div>
+        <span class="kicker">先给判断</span>
+        <h2>功能已经够用，缺的是视觉叙事和作者身份感。</h2>
+        <p>龙吟现在的信息架构、数据模型和写作闭环已经稳定。真正让界面显得“枯燥”的，是页面没有主次、所有表面同质、字体缺少文学气质、交互只发生在按钮上，以及最有价值的写作内容没有被当成舞台中心。</p>
+      </div>
+    </div>
+    <div class="summary-grid">
+      <article class="summary-card panel">
+        <div class="num">01 / ONE HERO</div>
+        <h3>一屏一个主角</h3>
+        <p>工作台的主角是正在写的书，写作页的主角是稿纸。其余导航、统计、工具主动退后，不和内容抢注意力。</p>
+      </article>
+      <article class="summary-card panel">
+        <div class="num">02 / SHELL &amp; PAPER</div>
+        <h3>深色书壳，暖色纸张</h3>
+        <p>用“深色应用外壳 + 暖白纸面”建立稳定对比。深色不是科技感，而是书房、灯下、安静的写作环境。</p>
+      </article>
+      <article class="summary-card panel">
+        <div class="num">03 / EARNED MOTION</div>
+        <h3>动效只解释状态</h3>
+        <p>翻页、展开、完成盖章、选中滑动。每次动效都对应一个真实动作，不用粒子、光效和循环动画填满屏幕。</p>
+      </article>
+    </div>
+    <div class="verdict">
+      <div class="verdict-main panel">
+        <h3>推荐方向：墨光书房</h3>
+        <p>保留现有墨绿与纸张基因，把产品做成一位作者的桌面：书封有重量，稿纸有光，关系图像星图，地图像羊皮纸图谱。整体安静，但每个关键动作都有质感。</p>
+      </div>
+      <div class="verdict-side">
+        <div class="mini-stat"><span>最值得借</span><strong>舞台 / 材质 / 响应</strong></div>
+        <div class="mini-stat"><span>最该马上改</span><strong>工作台与写作页</strong></div>
+        <div class="mini-stat"><span>必须避免</span><strong>霓虹化演示站</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="reference">
+    <div class="section-head">
+      <div class="section-no">02 / 调研对象</div>
+      <div>
+        <span class="kicker">visualization-collection</span>
+        <h2>它的“惊艳”不是靠组件多，而是靠四件事同时成立。</h2>
+        <p>这是一个视觉效果展示站，不是写作产品。它能给龙吟的启发是视觉编排方式：暗场衬底、发光材质、响应式空间、以及带物理感的切换。</p>
+      </div>
+    </div>
+    <div class="evidence">
+      <figure class="shot" style="margin:0">
+        <img src="assets/reference-visualization-collection.png" alt="visualization-collection 首页截图：深色背景、发光卡片和大尺寸展示区">
+        <figcaption class="caption"><b>参考站首屏</b> · 深海墨蓝舞台、渐隐网格、大尺寸玻璃质感展示卡。视觉冲击来自“暗场 + 单一光源 + 大尺度对比”，而不是全部元素都在动。</figcaption>
+      </figure>
+      <aside class="evidence-note">
+        <div>
+          <h3>拆开看，是六种可复用的设计机制</h3>
+          <p>大面积留暗让内容发光；每张展示卡是一个独立小世界；切换有物理惯性；指针接近时界面会回应；字体大而明确；页面节奏靠密度与留白交替。</p>
+        </div>
+        <ul>
+          <li><b>01</b> 舞台式明暗：背景退后，内容前进</li>
+          <li><b>02</b> 材质化对象：玻璃、纸张、封面、空间</li>
+          <li><b>03</b> 指针共谋：光斑、倾斜、景深随鼠标响应</li>
+          <li><b>04</b> 分层运动：结构、内容、光效不同速度</li>
+          <li><b>05</b> 密度节奏：大展示与小标题交替</li>
+          <li><b>06</b> 标题驱动：大字号 + 定制字重</li>
+        </ul>
+      </aside>
+    </div>
+    <div class="principles">
+      <article class="principle"><div class="idx">EVIDENCE / 01</div><h4>舞台不是背景图</h4><p>项目用深墨蓝渐变、极淡网格与局部发光托起内容；背景不抢字，但让卡片看起来像被灯照着。</p></article>
+      <article class="principle"><div class="idx">EVIDENCE / 02</div><h4>卡片是“物体”</h4><p>卡片有厚度、边缘高光、玻璃叠层和阴影。用户感觉是在看物件，而不是看表格行。</p></article>
+      <article class="principle"><div class="idx">EVIDENCE / 03</div><h4>切换要有惯性</h4><p>滑动 Tab 用 CSS 变量移动凹槽，并让容器短暂旋转；动作有起点、经过、落点，像真实机械。</p></article>
+      <article class="principle"><div class="idx">EVIDENCE / 04</div><h4>指针参与构图</h4><p>鼠标经过时，光斑位置、卡片倾斜和层叠关系变化。界面不再是被动等待点击的静态页面。</p></article>
+      <article class="principle"><div class="idx">EVIDENCE / 05</div><h4>把叙事物件做成真的</h4><p>翻书例子使用 3D `rotateY`、正反页和层级重建，让“翻书”成为一个可感知的空间动作。</p></article>
+      <article class="principle"><div class="idx">EVIDENCE / 06</div><h4>大字号建立人格</h4><p>标题使用 Source Han 系列字重与渐变、宽字距导航，优先建立记忆点，而不是把信息塞满。</p></article>
+    </div>
+    <div style="margin-top:18px" class="table-wrap">
+      <table>
+        <thead><tr><th>机制</th><th>参考项目里的做法</th><th>龙吟怎么用</th><th>边界</th></tr></thead>
+        <tbody>
+          <tr><td>暗场与光源</td><td>深色主场、明显的光斑与发光卡片</td><td>深墨书壳 + 暖纸稿面 + 工作台局部光池</td><td>正文区域不做发光；文字对比优先</td></tr>
+          <tr><td>物理切换</td><td>滑动槽 + 容器旋转 + 弹性曲线</td><td>章节/页签切换使用滑动墨条，旋转控制在 ±1°</td><td>只用于导航与书封，不用于表单</td></tr>
+          <tr><td>指针响应</td><td>光斑遮罩、卡片倾斜、层叠后撤</td><td>仅书封、灵感纸条、世界图谱节点响应</td><td>最大倾斜 2.5°，关闭减少动态模式</td></tr>
+          <tr><td>物件叙事</td><td>翻书、堆叠卡片、玻璃卡</td><td>书封、卷宗、图纸、档案卡；每个模块有自己的物件语言</td><td>功能密度不下降，列表仍可快速扫描</td></tr>
+          <tr><td>标题人格</td><td>超大标题 + 定制字体</td><td>衬线标题承载书名与章节，界面正文继续用无衬线</td><td>不把 UI 标签做成艺术字</td></tr>
+          <tr><td>高密度展示</td><td>响应式 10→1 列卡片墙</td><td>工作台书墙在宽屏扩展，窄屏收敛为 2—3 本</td><td>写作页不采用墙式布局</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" id="audit">
+    <div class="section-head">
+      <div class="section-no">03 / 现状审计</div>
+      <div>
+        <span class="kicker">为什么会显得枯燥</span>
+        <h2>问题不在功能少，而在每个页面都“平”得一样。</h2>
+        <p>下面的截图来自当前版本。工作台有大量空场但没有构图，写作页所有面板同色，文字和控件都缩在同一个视觉层级里。地图与关系图反而是最有辨识度的部分，说明产品并不缺“视觉能力”，缺的是一套统一的空间语言。</p>
+      </div>
+    </div>
+    <div class="audit-grid">
+      <div class="audit-stack">
+        <figure class="audit-shot" style="margin:0"><img src="assets/current-dashboard-dark.png" alt="当前工作台暗色截图"><div class="shot-meta"><span>当前工作台 · 暗色</span><span>大面积空白 / 没有主角</span></div></figure>
+        <figure class="audit-shot" style="margin:0"><img src="assets/current-writing-light.png" alt="当前写作页亮色截图"><div class="shot-meta"><span>当前写作页 · 亮色</span><span>所有面板同一表面</span></div></figure>
+      </div>
+      <div class="issues">
+        <article class="issue high"><div class="severity">1</div><div><h4>没有唯一主角</h4><p>工作台首屏最醒目的是操作按钮和搜索框，而不是正在写的书。用户打开后没有“回到故事里”的情绪入口。</p></div></article>
+        <article class="issue high"><div class="severity">2</div><div><h4>表面层级几乎不存在</h4><p>侧栏、顶栏、内容区和卡片都是相近的白或灰，只靠 1px 边框区分。页面像把多个白色矩形拼在一起，缺少近景、远景和景深。</p></div></article>
+        <article class="issue high"><div class="severity">3</div><div><h4>字体是工具字体，不是作者字体</h4><p>全局 13px 无衬线，标签常见 9—11px。页面标题、作品名、正文、按钮的重量差距不大，阅读时没有节奏。</p></div></article>
+        <article class="issue medium"><div class="severity">4</div><div><h4>主色出现得太少</h4><p>墨绿只在激活项、按钮和地图局部出现，无法形成品牌记忆。亮色模式下几乎只剩白与浅灰，暗色模式则像把色值简单反相。</p></div></article>
+        <article class="issue medium"><div class="severity">5</div><div><h4>多模块缺少物件身份</h4><p>作品是行、灵感是行、素材是行、装备是卡。除地图和关系图外，各模块看起来像同一个后台的不同表格。</p></div></article>
+        <article class="issue medium"><div class="severity">6</div><div><h4>动效隐形成本，不产生记忆</h4><p>现有按压缩放、页面进入和 glide 都正确，但幅度过小且发生在所有页面；没有一个“打开书 / 完成章节”这样的高记忆动作。</p></div></article>
+        <article class="issue low"><div class="severity">7</div><div><h4>空状态只是空</h4><p>没有作品、没有设定、没有灵感时，页面只显示一句说明。空状态本应是产品气质最强的展示位。</p></div></article>
+      </div>
+    </div>
+    <div class="keep-grid">
+      <div class="keep"><strong>保留：信息架构</strong><span>作品/创作/资料/世界设定的分组合理，不需要为了视觉重做导航逻辑。</span></div>
+      <div class="keep"><strong>保留：地图与关系图</strong><span>已有的物理地形、图谱层级与镜头感是产品最有辨识度的资产。</span></div>
+      <div class="keep"><strong>保留：轻量写作手感</strong><span>纯文本编辑、自动保存、专注模式不能为了“炫”而变重。</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="direction">
+    <div class="section-head">
+      <div class="section-no">04 / 视觉方向</div>
+      <div>
+        <span class="kicker">墨光书房 · The Ink Atelier</span>
+        <h2>不是把写作做成游戏，而是把它做成一个有仪式感的私人书房。</h2>
+        <p>方向来自龙吟本身：墨、纸、灯、地图、书信。视觉不追求赛博霓虹，而追求“安静但有光”。深色应用外壳像书房的书架与阴影，暖色正文纸像灯下稿纸，黄铜色只出现在进度和成就上。</p>
+      </div>
+    </div>
+    <div class="direction">
+      <span class="kicker">Designed for writing</span>
+      <h2>墨光书房</h2>
+      <p class="lead">一个可以在白天与深夜都待得住的创作空间。书封是入口，稿纸是中心，设定资料像手边档案，世界观像一张正在展开的星图。</p>
+      <div class="laws">
+        <div class="law"><b>一屏一主角</b><span>每个页面只有一个视觉焦点。工作台是当前书封，写作页是正文纸，资料页是当前条目。</span></div>
+        <div class="law"><b>深壳托暖纸</b><span>应用外壳使用深墨绿承载导航与工具，内容使用暖象牙纸。形成固定、舒适的空间关系。</span></div>
+        <div class="law"><b>动效有语义</b><span>翻页代表切换章节，盖章代表完成，光池代表当前焦点。没有语义的运动全部删掉。</span></div>
+      </div>
+    </div>
+
+    <div class="concept">
+      <div class="concept-stage">
+        <div class="concept-book" data-tilt tabindex="0" aria-label="目标工作台书封示意">
+          <span class="book-kind">长篇 · 奇幻</span>
+          <h3>黑暗之路</h3>
+          <p>第一卷 · 风起</p>
+          <div class="book-line"><i></i></div>
+          <div class="chapter">第三章 无名的信<br>257 字 · 继续写</div>
+          <span class="seal">墨</span>
+        </div>
+      </div>
+      <div class="concept-paper">
+        <div class="paper-sheet">
+          <small>第一卷 · 风起 &nbsp; / &nbsp; 第三章</small>
+          <h3>无名的信</h3>
+          <p>那封信没有署名。信封上只画了一道断开的河流，墨色很新。</p>
+          <p>罗惟坐在对面，将照夜弩的机括一件件摆在桌上。</p>
+          <div class="paper-foot"><span>本章 97 字</span><b>已保存 · 自动保存</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="theme-grid">
+      <article class="theme-card theme-light">
+        <span class="theme-label">Light / 日间书房</span>
+        <h4>暖纸 + 深书架</h4>
+        <p>外壳是有墨感的深绿，正文是柔和的象牙纸。不是纯白后台，而是可以长时间阅读的桌面。</p>
+        <div class="swatches"><i style="background:#18251e"></i><i style="background:#f6f1e6"></i><i style="background:#356f57"></i><i style="background:#ad874b"></i><i style="background:#a94c3e"></i></div>
+      </article>
+      <article class="theme-card theme-dark">
+        <span class="theme-label">Dark / 夜读</span>
+        <h4>墨夜 + 烛光</h4>
+        <p>不是简单反相。背景更深，稿纸保持低亮暖色，强调色像灯下的铜与玉，减少冷蓝与纯黑。</p>
+        <div class="swatches"><i style="background:#0c1210"></i><i style="background:#182019"></i><i style="background:#87b59a"></i><i style="background:#c5a05f"></i><i style="background:#c27a6c"></i></div>
+      </article>
+    </div>
+
+    <div class="token-grid">
+      <article class="token-card">
+        <h4>字体：让标题说文学，界面说清楚</h4>
+        <div class="type-specimen">
+          <div class="display">第三章 · 无名的信</div>
+          <div class="body">章节标题、书名、卷名与封面使用中文衬线；导航、字段、按钮继续使用无衬线。</div>
+        </div>
+        <ul class="token-list">
+          <li><span>正文</span><b>17px / 1.95</b></li>
+          <li><span>界面基字</span><b>14px / 1.6</b></li>
+          <li><span>页面标题</span><b>32–44px / 1.35</b></li>
+          <li><span>行宽</span><b>32–36 个汉字</b></li>
+        </ul>
+      </article>
+      <article class="token-card">
+        <h4>空间：先有光，再有边</h4>
+        <div class="type-specimen">
+          <div class="display" style="font-size:24px">书壳、纸面、浮层</div>
+          <div class="body">用三个表面层级替代“到处是卡片”。阴影只用于真正被抬起的对象，不再给每个区块加同样的边框。</div>
+        </div>
+        <ul class="token-list">
+          <li><span>外壳</span><b>--shell / 深墨绿</b></li>
+          <li><span>纸面</span><b>--paper / 暖象牙</b></li>
+          <li><span>浮层</span><b>--raised / 书封与对话框</b></li>
+          <li><span>圆角</span><b>4 / 8 / 14px</b></li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="pages">
+    <div class="section-head">
+      <div class="section-no">05 / 页面改造</div>
+      <div>
+        <span class="kicker">从入口到沉浸</span>
+        <h2>每个页面只回答一个问题：作者现在最该做什么？</h2>
+        <p>不是把所有页面都涂成同一种漂亮风格，而是让每个模块有自己的“物件身份”：工作台是书桌，写作页是稿纸，大纲是卷宗，灵感是纸条，世界观是星图，地图是图谱。</p>
+      </div>
+    </div>
+    <div class="page-map">
+      <article class="page-plan">
+        <div class="plan-head"><h3>工作台 / 书桌</h3><span>01</span></div>
+        <p>从“作品列表”变成“现在正在写的那本书”。打开页面第一眼看见书名、最近章节、真实进度与继续写作。</p>
+        <ul>
+          <li>当前作品做主角：大书封、书名衬线、章节与最近一句</li>
+          <li>右侧做书架：3—5 本作品以封面/书脊排列</li>
+          <li>进度只保留真实字数与卷目标，不再出现重复统计卡</li>
+          <li>最近灵感和最近章节可以作为书桌便笺出现，但必须可操作</li>
+        </ul>
+        <div class="avoid">避免：用假图表、假连续写作天数来制造“努力感”。</div>
+      </article>
+      <article class="page-plan">
+        <div class="plan-head"><h3>写作 / 稿纸</h3><span>02</span></div>
+        <p>把编辑器做成一张真正的纸，而不是一块铺满剩余空间的文本框。专注模式下只剩纸、灯和字。</p>
+        <ul>
+          <li>正文纸限制 760—820px，四周留出书桌空间</li>
+          <li>章节树像目录，右栏像资料卡抽屉，颜色比纸面更深一阶</li>
+          <li>顶部工具栏收进低对比“书壳”，写作时自动安静</li>
+          <li>保存成功只做一次轻微墨色呼吸，不做持续闪动</li>
+        </ul>
+        <div class="avoid">避免：正文使用玻璃、渐变、发光边框或任何持续动画。</div>
+      </article>
+      <article class="page-plan">
+        <div class="plan-head"><h3>大纲 / 卷宗</h3><span>03</span></div>
+        <p>世界规则和地形像写在总纲纸上；分卷像叠放的稿纸卷宗，每卷有自己的书签和真实进度。</p>
+        <ul>
+          <li>分卷卡改为“竖向卷宗页”，左侧书脊、顶部书名</li>
+          <li>本卷目标直接成为卷宗摘要，不与章节列表混放</li>
+          <li>卷切换使用墨条滑动，不再用普通下划线 Tab</li>
+        </ul>
+        <div class="avoid">避免：把分卷重新做回表格或大号 CRUD 卡。</div>
+      </article>
+      <article class="page-plan">
+        <div class="plan-head"><h3>灵感 / 便笺</h3><span>04</span></div>
+        <p>灵感不是“数据条目”，而是一张随手写下的纸条。视觉上可以有轻微纸张层次，但编辑体验仍然直接。</p>
+        <ul>
+          <li>纸条有细小的纸纹、书签色和分类标签，悬停仅抬升 2px</li>
+          <li>分类筛选像纸条索引，不做游戏化过滤面板</li>
+          <li>空状态展示一句写作引导，而不是空表格</li>
+        </ul>
+        <div class="avoid">避免：让每张纸随机旋转、漂浮或持续摆动。</div>
+      </article>
+      <article class="page-plan">
+        <div class="plan-head"><h3>世界观 / 星图</h3><span>05</span></div>
+        <p>关系图是龙吟最有潜力的视觉资产。把它从“关系可视化”提升为“世界星图”，但保持可检索、可定位。</p>
+        <ul>
+          <li>背景更暗，节点像星体，关系线按类型分色但不霓虹</li>
+          <li>选中实体时只放大当前局部，其余节点自然退后</li>
+          <li>右侧详情变成“档案纸”，和星图形成对比</li>
+        </ul>
+        <div class="avoid">避免：节点发光与粒子叠加导致无法阅读关系。</div>
+      </article>
+      <article class="page-plan">
+        <div class="plan-head"><h3>地图 / 图谱</h3><span>06</span></div>
+        <p>保留现有地形渲染，给地图加上真正的“图谱装裱”：纸边、图例、比例尺与图钉，而不是放在一块普通面板里。</p>
+        <ul>
+          <li>地图外围使用图册边框与轻纸纹，形成收藏品感</li>
+          <li>地点详情像旅行者边注；选中地点有轻微镜头推进</li>
+          <li>缩略图带纸签编号，方便多地图切换</li>
+        </ul>
+        <div class="avoid">避免：给地图叠加霓虹网格或过度滤镜，破坏地形可信度。</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="motion">
+    <div class="section-head">
+      <div class="section-no">06 / 动效语法</div>
+      <div>
+        <span class="kicker">少，但准确</span>
+        <h2>把动效从“按钮反馈”升级为“空间关系”。</h2>
+        <p>参考项目的弹性、指针响应和物理翻转值得借，但必须降幅、降频、限定对象。龙吟每次会话最多出现 2—3 个高记忆动作，其余全部安静。</p>
+      </div>
+    </div>
+    <div class="motion-list">
+      <div class="motion-row"><strong>进入写作页</strong><span>稿纸从书封后方轻微展开，背景亮度降低；只在从工作台进入时发生一次。</span><code>420–600ms / expo-out</code></div>
+      <div class="motion-row"><strong>书封响应指针</strong><span>最大倾斜 2.5°、位移 4px，光斑跟随指针；只作用于工作台书封，不作用于列表。</span><code>pointer / 180ms</code></div>
+      <div class="motion-row"><strong>卷宗与章节切换</strong><span>墨条滑动 + 新内容淡入，不使用旋转整页；目录展开收起保持目前的轻量。</span><code>220–320ms</code></div>
+      <div class="motion-row"><strong>专注模式</strong><span>周边界面渐隐、正文纸扩大并提升亮度，结束时有反向呼吸。</span><code>420ms / ease</code></div>
+      <div class="motion-row"><strong>章节完成</strong><span>章节状态改为完成时，纸上出现一次印章落下和墨晕扩散，结束后完全静止。</span><code>650ms / once</code></div>
+      <div class="motion-row"><strong>导航选中</strong><span>保留现有 glider，增加 1px 墨线投影与 60ms 延迟的文字入场。</span><code>220ms</code></div>
+    </div>
+    <div class="risk" style="margin-top:16px">
+      <div class="risk-main">
+        <h3>动效红线</h3>
+        <p>编辑器内禁用持续入场、全屏缩放、粒子与跟随鼠标的光效。所有运动必须在 `prefers-reduced-motion` 下降级；地图与关系图已有脉冲，其他页面不能再叠加循环动画。视觉升级不能以输入延迟为代价。</p>
+      </div>
+      <div class="no-list">
+        <span>不要霓虹渐变文字与发光边框</span>
+        <span>不要全站 3D 倾斜</span>
+        <span>不要为了“高级感”降低对比度</span>
+        <span>不要让装饰占满空白</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="roadmap">
+    <div class="section-head">
+      <div class="section-no">07 / 落地计划</div>
+      <div>
+        <span class="kicker">先做高感知的三件事</span>
+        <h2>先改变第一眼，再建立签名感。</h2>
+        <p>建议分三阶段，不一次性推翻全部页面。第一阶段只改视觉地基和工作台/写作页，就能获得最明显的“焕新感”；后续再补物件身份与仪式动作。</p>
+      </div>
+    </div>
+    <div class="roadmap">
+      <article class="phase p0">
+        <span class="phase-tag">P0 / 2–3 DAYS</span>
+        <h3>视觉地基</h3>
+        <p>最高感知、最低结构风险。</p>
+        <ul>
+          <li>新增深壳/纸面/浮层三层 token 与亮暗主题</li>
+          <li>字体层级：衬线标题 + 14px UI + 17px 正文</li>
+          <li>全局背景光池、纸纹与表面阴影</li>
+          <li>按钮、输入、弹窗、空状态的统一视觉重置</li>
+        </ul>
+        <span class="estimate">验收：不改交互逻辑，截图已能看出品牌差异</span>
+      </article>
+      <article class="phase p1">
+        <span class="phase-tag">P1 / 4–6 DAYS</span>
+        <h3>第一印象</h3>
+        <p>用户打开后立刻想继续写。</p>
+        <ul>
+          <li>工作台重排为书封主角 + 书架 + 可操作便笺</li>
+          <li>写作页改为居中稿纸，降低两侧工具噪音</li>
+          <li>书封生成器：根据书名与类型生成唯一封面</li>
+          <li>导航墨条、章节切换、专注模式光池</li>
+        </ul>
+        <span class="estimate">验收：5 秒内能说出当前作品、章节和下一步</span>
+      </article>
+      <article class="phase p2">
+        <span class="phase-tag">P2 / 5–8 DAYS</span>
+        <h3>签名体验</h3>
+        <p>让产品开始被记住。</p>
+        <ul>
+          <li>卷宗大纲、灵感便笺、资料索引卡的模块语言</li>
+          <li>章节完成印章、登录页墨迹入场</li>
+          <li>地图图册装裱与世界观星图层级</li>
+          <li>微交互巡检、性能与可访问性收口</li>
+        </ul>
+        <span class="estimate">验收：不开功能说明，用户也能感到“这是一个写作的地方”</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="acceptance">
+    <div class="section-head">
+      <div class="section-no">08 / 验收</div>
+      <div>
+        <span class="kicker">漂亮不能代替可用</span>
+        <h2>用“可感知、可阅读、可长期”三条线验收。</h2>
+      </div>
+    </div>
+    <div class="acceptance">
+      <article class="accept">
+        <h3>视觉验收</h3>
+        <ul>
+          <li>1440 / 1180 宽度无横向溢出，首屏有明显焦点</li>
+          <li>亮暗主题都使用同一套层级，不是简单反相</li>
+          <li>正文对比度达到 4.5:1，交互控件达到 3:1</li>
+          <li>页面最多同时存在 2 个装饰性动效层</li>
+        </ul>
+      </article>
+      <article class="accept">
+        <h3>体验验收</h3>
+        <ul>
+          <li>5 秒测试：能指出当前书、当前章、主操作</li>
+          <li>从打开工作台到进入正文不超过 2 次点击</li>
+          <li>输入正文时无重渲染、无布局跳动、无动画干扰</li>
+          <li>尊重 reduced-motion；键盘焦点始终可见</li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap" style="margin-top:14px">
+      <table>
+        <thead><tr><th>优先级</th><th>改造项</th><th>感知收益</th><th>实现风险</th><th>建议</th></tr></thead>
+        <tbody>
+          <tr><td>最高</td><td>深色书壳 + 暖纸正文 + 字体层级</td><td><span class="tag ok">极高</span></td><td><span class="tag ok">低</span></td><td>立即做</td></tr>
+          <tr><td>最高</td><td>工作台当前书封 + 书架</td><td><span class="tag ok">极高</span></td><td><span class="tag warn">中</span></td><td>P1 首先做</td></tr>
+          <tr><td>高</td><td>写作稿纸与专注光池</td><td><span class="tag ok">高</span></td><td><span class="tag warn">中</span></td><td>与工作台同批</td></tr>
+          <tr><td>中</td><td>卷宗/便笺/图谱物件语言</td><td><span class="tag ok">中高</span></td><td><span class="tag warn">中</span></td><td>P2</td></tr>
+          <tr><td>低</td><td>全站粒子/鼠标拖尾/霓虹</td><td><span class="tag no">负收益</span></td><td><span class="tag warn">中</span></td><td>不做</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" id="tech">
+    <div class="section-head">
+      <div class="section-no">09 / 技术路线</div>
+      <div>
+        <span class="kicker">不加框架，也能做出质感</span>
+        <h2>在现有单文件前端的约束内完成，不引入新的视觉依赖。</h2>
+      </div>
+    </div>
+    <div class="verdict">
+      <div class="verdict-main panel">
+        <h3>实现原则</h3>
+        <p>统一扩展现有 `:root` token；用 CSS 变量驱动主题与指针；用 requestAnimationFrame 控制指针倾斜；书封由书名生成确定性纹样；字体使用本地 WOFF2 子集并配置 `font-display: swap`。所有效果先做渐进增强，性能不足时自动关闭。</p>
+      </div>
+      <div class="verdict-side">
+        <div class="mini-stat"><span>依赖</span><strong>继续保持零依赖</strong></div>
+        <div class="mini-stat"><span>改动面</span><strong>CSS token + 页面结构</strong></div>
+        <div class="mini-stat"><span>门禁</span><strong>截图 + 现有 verify</strong></div>
+      </div>
+    </div>
+    <div class="source-list">
+      <div class="source"><small>Reference repository</small><a href="https://github.com/hepengwei/visualization-collection" target="_blank" rel="noreferrer">hepengwei/visualization-collection</a></div>
+      <div class="source"><small>Live site</small><a href="http://hepengwei.cn" target="_blank" rel="noreferrer">http://hepengwei.cn</a></div>
+      <div class="source"><small>Structure evidence</small><a href="https://github.com/hepengwei/visualization-collection/blob/master/src/components/GridContent/index.module.scss" target="_blank" rel="noreferrer">GridContent · 响应式展示密度</a></div>
+      <div class="source"><small>Motion evidence</small><a href="https://github.com/hepengwei/visualization-collection/blob/master/src/pages/html/InteractiveDesign/components/SlideButtonTab/index.module.scss" target="_blank" rel="noreferrer">SlideButtonTab · 凹槽与旋转</a></div>
+      <div class="source"><small>Pointer evidence</small><a href="https://github.com/hepengwei/visualization-collection/blob/master/src/pages/html/InteractiveDesign/components/MouseHover4/card.module.scss" target="_blank" rel="noreferrer">MouseHover4 · 指针光斑</a></div>
+      <div class="source"><small>Physical evidence</small><a href="https://github.com/hepengwei/visualization-collection/blob/master/src/pages/html/InteractiveDesign/components/FlipBook/index.tsx" target="_blank" rel="noreferrer">FlipBook · 3D 翻页</a></div>
+    </div>
+    <div class="footer">
+      <div><strong>龙吟写作</strong><br>视觉与交互升级调研方案 · v1</div>
+      <div>参考项目用于设计机制研究，不直接复制其视觉皮肤或代码。</div>
+    </div>
+  </section>
+</main>
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const navLinks = [...document.querySelectorAll('.topnav a')];
+  const navSections = navLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+  const syncNav = () => {
+    let activeIndex = 0;
+    navSections.forEach((section, index) => {
+      if (section.getBoundingClientRect().top < window.innerHeight * .36) activeIndex = index;
+    });
+    navLinks.forEach((link, index) => link.classList.toggle('current', index === activeIndex));
+  };
+  window.addEventListener('scroll', syncNav, { passive: true });
+  syncNav();
+  document.querySelectorAll('[data-tilt]').forEach(card => {
+    if (reduceMotion) return;
+    card.addEventListener('pointermove', event => {
+      const box = card.getBoundingClientRect();
+      const x = (event.clientX - box.left) / box.width - .5;
+      const y = (event.clientY - box.top) / box.height - .5;
+      card.style.setProperty('--ry', `${(x * 5).toFixed(2)}deg`);
+      card.style.setProperty('--rx', `${(-y * 4).toFixed(2)}deg`);
+    });
+    card.addEventListener('pointerleave', () => {
+      card.style.setProperty('--ry', '0deg');
+      card.style.setProperty('--rx', '0deg');
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>龙吟写作 · 中文排版调研与优化方案</title>
+<style>
+  :root {
+    --paper: #fbf8f1;
+    --paper-soft: #f4efe4;
+    --ink: #242823;
+    --secondary: #5d655d;
+    --tertiary: #8b9187;
+    --line: #ded8cb;
+    --line-strong: #c9c0af;
+    --brass: #a77f43;
+    --brass-soft: #efe2cb;
+    --green: #326b55;
+    --code-bg: #1c241f;
+    --code-text: #dfe6dc;
+    --serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+    --sans: "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(ellipse at 50% -12%, rgba(198,166,107,.12), transparent 34rem),
+      var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .page { width: min(1080px, calc(100% - 48px)); margin: 0 auto; padding: 56px 0 96px; }
+  header.hero { padding: 22px 0 34px; border-bottom: 1px solid var(--line); }
+  .eyebrow { color: var(--brass); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
+  h1 { margin: 10px 0 14px; font-family: var(--serif); font-size: clamp(30px, 4vw, 46px); line-height: 1.3; font-weight: 600; letter-spacing: -.02em; }
+  .lede { max-width: 760px; margin: 0; color: var(--secondary); font-size: 16px; line-height: 1.9; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 20px; color: var(--tertiary); font-size: 11px; }
+  nav.toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px 18px; margin: 30px 0 0; padding: 18px 20px; border: 1px solid var(--line); border-radius: 10px; background: color-mix(in srgb, var(--paper) 72%, var(--paper-soft)); }
+  nav.toc a { color: var(--secondary); font-size: 12px; text-decoration: none; }
+  nav.toc a:hover { color: var(--green); }
+  section { margin-top: 52px; scroll-margin-top: 24px; }
+  h2 { margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid var(--line); font-family: var(--serif); font-size: 25px; line-height: 1.4; font-weight: 600; }
+  h3 { margin: 26px 0 10px; font-family: var(--serif); font-size: 18px; line-height: 1.5; font-weight: 600; }
+  h4 { margin: 18px 0 6px; font-size: 13px; letter-spacing: .04em; }
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 0 0 14px; padding-left: 22px; }
+  li { margin: 4px 0; }
+  code { padding: 1px 5px; border-radius: 4px; background: var(--paper-soft); color: #5d4b2c; font-family: var(--mono); font-size: .9em; }
+  pre { margin: 12px 0 18px; padding: 16px 18px; overflow: auto; border-radius: 8px; background: var(--code-bg); color: var(--code-text); font-family: var(--mono); font-size: 12px; line-height: 1.75; }
+  pre code { padding: 0; background: none; color: inherit; font-size: inherit; }
+  .callout { margin: 16px 0; padding: 16px 18px; border-left: 3px solid var(--brass); background: linear-gradient(90deg, var(--brass-soft), transparent 72%); color: var(--secondary); }
+  .callout strong { color: var(--ink); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin: 14px 0 18px; }
+  .card { padding: 16px 18px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.32); }
+  .card h4 { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+  .tag { display: inline-block; margin: 0 5px 5px 0; padding: 1px 7px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--secondary); font-size: 10px; }
+  table { width: 100%; margin: 14px 0 20px; border-collapse: collapse; font-size: 12px; line-height: 1.7; }
+  th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { color: var(--tertiary); font-size: 10px; font-weight: 500; letter-spacing: .06em; background: var(--paper-soft); }
+  td strong { font-weight: 600; }
+  .status { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 10px; }
+  .status.good { background: rgba(50,107,85,.12); color: var(--green); }
+  .status.warn { background: rgba(167,127,67,.14); color: var(--brass); }
+  .status.bad { background: rgba(150,62,52,.12); color: #963e34; }
+  .demo-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 22px; }
+  .demo { padding: 18px 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+  .demo h4 { margin: 0 0 12px; }
+  .demo p { margin: 0; font-family: var(--serif); font-size: 15px; line-height: 1.95; }
+  .demo.bad p { text-indent: 0; text-align: left; }
+  .demo.good p { text-indent: 2em; text-align: justify; text-justify: inter-character; line-break: strict; hanging-punctuation: allow-end; }
+  .demo .wrong { color: #963e34; font-size: 11px; }
+  .demo .right { color: var(--green); font-size: 11px; }
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0 22px; }
+  .flow div { padding: 12px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper-soft); font-size: 11px; text-align: center; }
+  .flow b { display: block; margin-bottom: 4px; color: var(--green); font-size: 10px; letter-spacing: .08em; }
+  .sources { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .sources li { color: var(--secondary); font-size: 12px; }
+  .sources a { color: var(--green); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--green) 35%, transparent); }
+  footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--tertiary); font-size: 11px; }
+  @media (max-width: 720px) {
+    .page { width: calc(100% - 28px); padding-top: 34px; }
+    .demo-wrap, .flow { grid-template-columns: 1fr; }
+    table { display: block; overflow-x: auto; }
+  }
+  @media print {
+    body { background: #fff; }
+    nav.toc { display: none; }
+    section { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="hero">
+    <div class="eyebrow">Research · Chinese Typography</div>
+    <h1>中文排版调研与龙吟优化方案</h1>
+    <p class="lede">调研 GitHub 上成熟的中文排版项目，拆解它们如何处理首行缩进、标点、中西文混排、行高与阅读宽度，并给出一套适合龙吟“长篇写作 + 本地优先”的单一落地方案。</p>
+    <div class="meta">
+      <span>调研日期：2026-11-02</span>
+      <span>范围：Heti、typo.css、Han.css、pangu.js、中文文案排版指北、W3C CLReq</span>
+      <span>结论：内容与版式分离，版式由 CSS 承担</span>
+    </div>
+    <nav class="toc">
+      <a href="#conclusion">01 · 结论先行</a>
+      <a href="#projects">02 · 调研对象</a>
+      <a href="#source">03 · 源码级拆解</a>
+      <a href="#common">04 · 共性结论</a>
+      <a href="#audit">05 · 龙吟现状审计</a>
+      <a href="#plan">06 · 优化方案</a>
+      <a href="#accept">07 · 验收标准</a>
+      <a href="#sources">08 · 参考来源</a>
+    </nav>
+  </header>
+
+  <section id="conclusion">
+    <h2>01 · 结论先行</h2>
+    <p>成熟项目没有把“首行缩进”写进正文内容，而是把中文排版拆成三层：</p>
+    <div class="grid">
+      <div class="card">
+        <h4>内容层</h4>
+        <p>作者写的是干净文本：段落、标点、换行。中英文之间是否加空格、是否首行缩进，不进入正文主副本。</p>
+      </div>
+      <div class="card">
+        <h4>版式层</h4>
+        <p>用段落元素 <code>&lt;p&gt;</code> 和 CSS 完成 <code>text-indent:2em</code>、行高、字距、两端对齐、避头尾与阅读宽度。</p>
+      </div>
+      <div class="card">
+        <h4>增强层</h4>
+        <p>浏览器暂不支持的标点挤压、中西文自动间距，才由 JavaScript 在渲染层补充，并且不写回正文。</p>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>给龙吟的唯一建议：</strong>正文继续保存干净文本；新增“排版预览/阅读视图”，由 CSS 负责首行缩进与阅读节奏；“中文排版”按钮不再向正文插入 <code>U+3000</code>，只保留标点与空行校正，缩进只在预览和导出时生成。
+    </div>
+  </section>
+
+  <section id="projects">
+    <h2>02 · 调研对象</h2>
+    <table>
+      <thead>
+        <tr><th>项目</th><th>定位</th><th>实现方式</th><th>对龙吟的价值</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Heti 赫蹏</strong><br><span class="tag">CSS + JS</span></td>
+          <td>网页正文中文排版增强，支持古文、诗词、行间注、多栏、竖排、暗色模式</td>
+          <td>CSS 负责网格、字体、行高、缩进与竖排；JavaScript 负责中西文间距和全角标点挤压</td>
+          <td><span class="status good">高</span> 版式分层最完整，适合作为阅读视图的参考</td>
+        </tr>
+        <tr>
+          <td><strong>typo.css</strong><br><span class="tag">纯 CSS</span></td>
+          <td>中文网页重设与排版，面向现代中文阅读</td>
+          <td>字体栈、行高、断行、中西部间距、着重号、竖排全部走 CSS</td>
+          <td><span class="status good">高</span> 直接可借的 CSS 属性组合与字体栈</td>
+        </tr>
+        <tr>
+          <td><strong>Han.css 汉字标准格式</strong><br><span class="tag">CSS + JS</span></td>
+          <td>完整汉字排版框架，支持繁简日、Ruby、注音、直排</td>
+          <td>Sass/Stylus 组织，normalize + 汉字专属规则 + 脚本增强</td>
+          <td><span class="status warn">中</span> 规则全面但体量大，适合查漏补缺</td>
+        </tr>
+        <tr>
+          <td><strong>pangu.js</strong><br><span class="tag">纯 JS</span></td>
+          <td>自动在中英文、数字之间插入空格</td>
+          <td>正则识别 CJK 与拉丁/数字边界，处理引号例外，遍历文本节点</td>
+          <td><span class="status warn">中</span> 只适合渲染层，不应写入正文</td>
+        </tr>
+        <tr>
+          <td><strong>中文文案排版指北</strong><br><span class="tag">规范</span></td>
+          <td>中英文空格、全角标点、专有名词等写作规范</td>
+          <td>规则文档，不是排版引擎</td>
+          <td><span class="status good">高</span> 可作为“标点与空格”校验规则来源</td>
+        </tr>
+        <tr>
+          <td><strong>W3C CLReq</strong><br><span class="tag">标准</span></td>
+          <td>中文排版需求：断行、标点、缩进、直排、Ruby</td>
+          <td>规范条款，不提供代码</td>
+          <td><span class="status good">高</span> 作为所有实现规则的最终依据</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="source">
+    <h2>03 · 源码级拆解</h2>
+
+    <h3>3.1 Heti：CSS 打底，JavaScript 只补浏览器缺口</h3>
+    <p>Heti 的 CSS 负责正文的阅读节奏。它的段落默认不是“缩进”，而是段间留白加两端对齐；只有古文、行间注、多栏等书籍式版式才打开 <code>text-indent:2em</code>。</p>
+    <pre><code>.heti p {
+  margin-block-start: 12px;
+  margin-block-end: 24px;
+  text-align: justify;
+}
+
+.heti--ancient p,
+.heti--annotation p {
+  text-indent: 2em;
+}
+
+.heti {
+  letter-spacing: .02em;
+  line-break: strict;
+  text-spacing-trim: normal;
+}</code></pre>
+    <p>当 <code>text-autospace</code>、标点挤压等 CSS 特性支持不完整时，Heti 用约 9.7KB 的增强脚本，在渲染层插入 <code>&lt;heti-spacing&gt;</code> 标记：</p>
+    <pre><code>const heti = new Heti('.heti');
+heti.autoSpacing();
+// 在 CJK 与拉丁字母/数字边界插入间距标记
+// 对连续全角标点做挤压
+// 不修改正文原始字符串</code></pre>
+    <p>它还把 <code>pre</code>、<code>code</code>、<code>sup</code>、<code>sub</code> 等非正文元素排除在自动间距之外，避免把代码和公式排坏。这是“排版增强不碰内容”的典型做法。</p>
+
+    <h3>3.2 typo.css：把现代 CSS 用到极致</h3>
+    <p>typo.css 用纯 CSS 完成大部分中文阅读规则，核心组合如下：</p>
+    <pre><code>.typo {
+  font-family: var(--typo-font-serif);
+  line-height: 1.75;
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hanging-punctuation: allow-end;
+  text-autospace: ideograph-alpha ideograph-numeric;
+  text-spacing-trim: normal;
+  text-emphasis-position: under right;
+}
+
+.typo-readable { max-width: 48em; }
+
+.typo-justify {
+  text-align: justify;
+  text-justify: inter-character;
+}
+
+.typo-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  line-height: 1.8;
+}</code></pre>
+    <p>它同时提供简繁两套字体栈：正文用宋体/思源宋体，标题用黑体/思源黑体，楷体和仿宋作为显式 helper。这个“正文宋、标题黑、特殊场景楷/仿宋”的分工，比全站单一字体更接近纸书。</p>
+
+    <h3>3.3 Han.css：规则最全，但体量也最大</h3>
+    <p>Han.css 约 64KB，包含 normalize、汉字标点、着重号、Ruby/注音、直排和大量兼容选择器。它证明了中文排版可以完全由 CSS 承担，但也说明“把所有规则一次性塞进一个框架”会带来较高的样式复杂度和覆盖风险。对龙吟来说，更适合按需摘取规则，而不是整体引入。</p>
+
+    <h3>3.4 pangu.js：自动空格的边界处理</h3>
+    <p>pangu.js 的核心不是简单替换，而是判断“边界”是否真的需要空格：</p>
+    <pre><code>needsBoundarySpace(currentTail, nextFirst)
+spaceJunction(currentTail, nextFirst)
+isQuoteNextToCjk(last, first)
+isStandaloneQuote(text)</code></pre>
+    <p>它会区分 CJK、拉丁字母、数字、标点与引号，避免在引号、HTML 标签和代码块中误加空格。但它的输出是插入空格字符，因此更适合“阅读器渲染网页”而不是“写作工具修改正文”。</p>
+
+    <h3>3.5 中文文案排版指北与 W3C CLReq</h3>
+    <p>两者提供规则依据，而不是代码：</p>
+    <ul>
+      <li>中文与英文、数字之间应有可感知的间距；全角标点与其他字符之间不再加空格。</li>
+      <li>使用全角标点；避免重复标点；专有名词保持正确大小写。</li>
+      <li>行首禁则：句号、逗号、顿号、分号、冒号、问号、叹号、右引号、右括号不能出现在行首。</li>
+      <li>行尾禁则：左引号、左括号不能出现在行尾。</li>
+      <li>连续全角标点可挤压；句末标点可悬挂；中文正文首行缩进两个字符。</li>
+      <li>直排使用 <code>writing-mode: vertical-rl</code>，Ruby 使用 <code>ruby-position</code>。</li>
+    </ul>
+  </section>
+
+  <section id="common">
+    <h2>04 · 共性结论</h2>
+    <ol>
+      <li><strong>内容与版式分离。</strong>成熟项目不会把首行缩进、半角转全角、自动空格写进正文主副本；这些都属于展示层或导出层。</li>
+      <li><strong>段落模型是前提。</strong>首行缩进必须作用在段落元素上。纯 <code>&lt;textarea&gt;</code> 只有一个文本流，无法给“每一段”加 CSS 缩进。</li>
+      <li><strong>CSS 优先，JavaScript 兜底。</strong>行高、字距、宽度、两端对齐、避头尾、着重号都能用 CSS；只有浏览器未普及的标点挤压和中西文间距才用脚本。</li>
+      <li><strong>阅读宽度比字号更重要。</strong>正文不是越宽越好；成熟方案普遍把阅读列控制在 34–48em，配合 1.7–2.0 行高。</li>
+      <li><strong>规则要可降级。</strong><code>text-autospace</code>、<code>text-spacing-trim</code>、<code>hanging-punctuation</code> 的支持度并不一致，必须用 <code>@supports</code> 渐进增强，不能牺牲基本可读性。</li>
+    </ol>
+  </section>
+
+  <section id="audit">
+    <h2>05 · 龙吟现状审计</h2>
+    <h3>5.1 当前“中文排版”做了什么</h3>
+    <p>当前实现位于 <code>web/js/domain/writing/format.js</code>，点击按钮后直接修改正文：</p>
+    <pre><code>// 1. 中文后的半角标点转全角
+// 2. ... 转 ……，-- 转 ——
+// 3. 删除行尾空格，压缩连续空行
+// 4. 每个非空行前插入两个全角空格
+// 5. 已是 　　 的行、# 标题、&gt; 引用、- / * 列表跳过</code></pre>
+    <p>它把“内容规范化”和“版式呈现”混在一次操作里，而且直接写入正文。</p>
+
+    <h3>5.2 已暴露的问题</h3>
+    <table>
+      <thead><tr><th>问题</th><th>原因</th><th>影响</th></tr></thead>
+      <tbody>
+        <tr><td>第一行不缩进</td><td>末尾 <code>.trim()</code> 删掉了整篇首部空白，包括刚加上的 <code>U+3000</code></td><td><span class="status bad">已修复</span> 但说明“改正文”很脆弱</td></tr>
+        <tr><td>正文被装饰字符污染</td><td>缩进写入正文，而不是由版式生成</td><td>AI 上下文、搜索、字数、复制、导出都带着不可见空格</td></tr>
+        <tr><td>每个非空行都被当成一段</td><td>按换行逐行缩进</td><td>硬换行的续行也会被缩进，段落语义被误判</td></tr>
+        <tr><td>无法做真正的段落排版</td><td>编辑器是 <code>textarea</code>，没有段落元素</td><td>行高、首行缩进、两端对齐只能作用于整个文本流</td></tr>
+        <tr><td>阅读行宽偏长</td><td>编辑区正文列 960px，17px 字号约 56 个汉字/行</td><td>长段落阅读时回行困难，眼睛容易串行</td></tr>
+      </tbody>
+    </table>
+
+    <h3>5.3 现有优点</h3>
+    <ul>
+      <li>正文已经使用宋体优先的 <code>--font-reading</code> 字体栈，方向正确。</li>
+      <li>行高 <code>2.12</code>、17px 字号，基础阅读节奏不差。</li>
+      <li>暗色模式与专注模式已具备，版式层可以复用。</li>
+      <li>正文主副本是 Markdown 纯文本，天然适合“内容与版式分离”。</li>
+    </ul>
+
+    <div class="demo-wrap">
+      <div class="demo bad">
+        <h4><span class="wrong">现状：内容里塞缩进</span></h4>
+        <p>　　第一段被写入了两个全角空格，复制、搜索和 AI 上下文都会带着它。第二段同样如此，硬换行的续行也会被误缩进。</p>
+        <p style="margin-top:10px"><span class="wrong">缩进是内容的一部分，删除按钮也删不掉语义。</span></p>
+      </div>
+      <div class="demo good">
+        <h4><span class="right">建议：内容干净，CSS 缩进</span></h4>
+        <p>第一段保持干净文本，首行缩进由 <code>text-indent:2em</code> 产生。复制、搜索、AI 上下文都只看到真正的文字。</p>
+        <p>第二段同理。行宽、行高、两端对齐、避头尾由阅读视图统一控制。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="plan">
+    <h2>06 · 优化方案</h2>
+    <p>方案名称：<strong>内容与版式分离 + 排版预览</strong>。只做这一套，不引入第二套并行的写法。</p>
+
+    <div class="flow">
+      <div><b>01 · 正文</b>干净 Markdown 纯文本，不写入装饰性空格</div>
+      <div><b>02 · 解析</b>按空行/非空行解析为段落，保留标题、引用、列表</div>
+      <div><b>03 · 版式</b>阅读视图用 &lt;p&gt; + CSS 完成缩进、行高、对齐、避头尾</div>
+      <div><b>04 · 导出</b>按需在导出边界添加缩进，正文主副本不变</div>
+    </div>
+
+    <h3>6.1 数据层：正文保持干净</h3>
+    <ul>
+      <li>正文主副本继续是每章一个 <code>.md</code> 文件，不写入 <code>U+3000</code>。</li>
+      <li>段落定义：连续非空行视为一个段落；空行分隔段落；<code>#</code>、<code>&gt;</code>、<code>- </code>、<code>* </code> 保留结构语义。</li>
+      <li>标点校正只做“半角转全角、省略号、破折号、压缩空行”，不再插入缩进。</li>
+      <li>AI 上下文、搜索、字数、复制、备份都使用干净正文。</li>
+    </ul>
+
+    <h3>6.2 版式层：新增阅读视图</h3>
+    <p>在写作页工具栏把“中文排版”改为“排版预览”，打开只读阅读视图。正文按段落渲染为 <code>&lt;p&gt;</code>，由统一类名 <code>.chapter-prose</code> 接管版式：</p>
+    <pre><code>.chapter-prose {
+  max-width: 38em;
+  margin: 0 auto;
+  font-family: var(--font-reading);
+  font-size: 17px;
+  line-height: 1.95;
+  letter-spacing: .01em;
+  text-align: justify;
+  text-justify: inter-character;
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hanging-punctuation: allow-end;
+  text-autospace: ideograph-alpha ideograph-numeric;
+  text-spacing-trim: normal;
+}
+
+.chapter-prose p {
+  margin: 0;
+  text-indent: 2em;
+}
+
+.chapter-prose h1,
+.chapter-prose h2,
+.chapter-prose blockquote,
+.chapter-prose li {
+  text-indent: 0;
+}</code></pre>
+    <ul>
+      <li><strong>阅读宽度</strong>：38em 约 646px，17px 宋体约 38 个汉字/行，接近纸书阅读节奏。</li>
+      <li><strong>首行缩进</strong>：只作用于 <code>p</code>；标题、引用、列表不缩进。</li>
+      <li><strong>两端对齐</strong>：<code>text-align: justify</code> + <code>text-justify: inter-character</code>；不支持时退化为左对齐，不强行拉伸。</li>
+      <li><strong>避头尾</strong>：<code>line-break: strict</code>、<code>word-break: normal</code>、<code>overflow-wrap: break-word</code>。</li>
+      <li><strong>渐进增强</strong>：<code>text-autospace</code>、<code>text-spacing-trim</code>、<code>hanging-punctuation</code> 用 <code>@supports</code> 包裹；不支持时保持普通排版，不做 DOM 注入。</li>
+      <li><strong>字体</strong>：正文继续 <code>--font-reading</code>（Noto Serif SC / Source Han Serif SC / Songti SC）；标题用现有展示字体，不混用。</li>
+    </ul>
+
+    <h3>6.3 交互层：一个入口，三个明确动作</h3>
+    <p>工具栏“中文排版”改为“排版”入口，打开预览面板。面板里只保留三个动作，避免把不同语义混在一次点击里：</p>
+    <ol>
+      <li><strong>预览</strong>：默认展示当前章的排版效果，不写入正文。</li>
+      <li><strong>标点校正</strong>：只处理标点、省略号、破折号和空行，应用前展示差异，可撤销。</li>
+      <li><strong>复制排版文本</strong>：复制时临时给每段加 <code>U+3000</code>，用于外部编辑器或粘贴到不支持 CSS 的地方；正文主副本不变。</li>
+    </ol>
+    <p>这样“首行缩进”从一次不可逆的内容修改，变成可预览、可撤销、可选择的输出。</p>
+
+    <h3>6.4 代码组织</h3>
+    <table>
+      <thead><tr><th>位置</th><th>职责</th></tr></thead>
+      <tbody>
+        <tr><td><code>web/js/domain/typography.js</code></td><td>纯函数：段落切分、标点校正、导出缩进、标题/引用/列表识别</td></tr>
+        <tr><td><code>web/js/controllers/typography-clicks.js</code></td><td>打开预览、应用标点校正、复制排版文本</td></tr>
+        <tr><td><code>web/js/dialogs/typography-dialog.js</code></td><td>阅读视图与差异预览的弹窗结构</td></tr>
+        <tr><td><code>web/styles/typography.css</code></td><td><code>.chapter-prose</code> 与阅读视图专用样式</td></tr>
+        <tr><td><code>web/styles/tokens.css</code></td><td>新增阅读字号、行高、阅读宽度 token，禁止散落新值</td></tr>
+      </tbody>
+    </table>
+
+    <h3>6.5 兼容与边界</h3>
+    <ul>
+      <li>不引入 <code>contenteditable</code> 富文本编辑器；现有 <code>textarea</code> 的撤销、@ 选择器、输入法行为保持稳定。</li>
+      <li>不在编辑器中自动插入中英文空格；需要时在阅读视图用 CSS 渐进增强。</li>
+      <li>不把 Han.css 整体引入；只摘取与正文阅读相关的规则，避免 64KB 样式覆盖现有视觉系统。</li>
+      <li>诗词、引用、列表、代码块、英文段落单独豁免缩进与两端对齐。</li>
+      <li>导出 Markdown 默认保持干净文本；需要“带缩进 txt”时走导出边界，不污染主副本。</li>
+    </ul>
+
+    <h3>6.6 收益与代价</h3>
+    <div class="grid">
+      <div class="card">
+        <h4>收益</h4>
+        <ul>
+          <li>正文可复制、可搜索、可被 AI 正确理解。</li>
+          <li>首行缩进、行宽、行高可以随时调整，不需要改历史正文。</li>
+          <li>排版错误可一键回退，不再依赖撤销栈。</li>
+          <li>阅读视图可以独立优化，不影响写作编辑器。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>代价</h4>
+        <ul>
+          <li>需要新增一个预览界面和一套排版样式。</li>
+          <li>编辑器本身仍然不显示段落缩进，作者看到的是干净稿纸。</li>
+          <li>部分高级特性（标点挤压、悬挂标点）依赖浏览器支持，需接受渐进降级。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="accept">
+    <h2>07 · 验收标准</h2>
+    <ul>
+      <li>正文主副本中不出现由预览产生的 <code>U+3000</code>；保存前后文本哈希一致。</li>
+      <li>阅读视图中第一段首行缩进恒为 <code>2em</code>，标题、引用、列表不缩进。</li>
+      <li>阅读列宽度为 <code>38em</code>，行高 <code>1.95</code>，字号 <code>17px</code>，全部来自 token。</li>
+      <li>“标点校正”只修改标点、省略号、破折号和空行，不修改缩进。</li>
+      <li>“复制排版文本”复制出的内容带 <code>U+3000</code>，但正文主副本不变。</li>
+      <li>不支持 <code>text-autospace</code> 的浏览器仍保持可读，不出现重叠或溢出。</li>
+      <li>门禁覆盖：段落切分、标点校正、导出缩进、首行缩进 CSS、正文不含装饰空格。</li>
+    </ul>
+  </section>
+
+  <section id="sources">
+    <h2>08 · 参考来源</h2>
+    <ul class="sources">
+      <li><a href="https://github.com/sivan/heti" target="_blank" rel="noreferrer">sivan/heti · 赫蹏</a>：CSS 排版增强 + JavaScript 中西文间距与标点挤压。</li>
+      <li><a href="https://github.com/sofish/typo.css" target="_blank" rel="noreferrer">sofish/typo.css</a>：纯 CSS 中文网页重设与排版，字体栈、断行、间距、竖排。</li>
+      <li><a href="https://github.com/ethantw/Han" target="_blank" rel="noreferrer">ethantw/Han · 汉字标准格式</a>：完整汉字排版框架，Ruby、注音、直排、着重号。</li>
+      <li><a href="https://github.com/vinta/pangu.js" target="_blank" rel="noreferrer">vinta/pangu.js</a>：CJK 与拉丁/数字边界的自动空格处理。</li>
+      <li><a href="https://github.com/sparanoid/chinese-copywriting-guidelines" target="_blank" rel="noreferrer">sparanoid/chinese-copywriting-guidelines</a>：中文文案排版指北。</li>
+      <li><a href="https://www.w3.org/TR/clreq/" target="_blank" rel="noreferrer">W3C Chinese Layout Requirements (CLReq)</a>：中文排版需求标准。</li>
+      <li><a href="https://github.com/koodo-reader/koodo-reader" target="_blank" rel="noreferrer">koodo-reader/koodo-reader</a>：阅读器字体、字号、行高与间距设置的产品参考。</li>
+    </ul>
+  </section>
+
+  <footer>
+    龙吟写作 · 中文排版调研与优化方案 · 2026-11-02
+  </footer>
+</div>
+</body>
+</html>
